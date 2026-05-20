@@ -7,13 +7,14 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.exoplayer.ExoPlayer;
 
 public class RadioService extends Service {
 
@@ -66,7 +67,7 @@ public class RadioService extends Service {
             }
 
             @Override
-            public void onPlayerError(PlaybackException error) {
+            public void onPlayerError(@NonNull PlaybackException error) {
                 stopForeground(true);
                 stopSelf();
             }
