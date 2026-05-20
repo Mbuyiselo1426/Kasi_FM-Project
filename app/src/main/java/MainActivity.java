@@ -1,4 +1,4 @@
-package com.kasiefm;
+package com.kasief;
 
 import android.content.Intent;
 import android.os.Bundle;
