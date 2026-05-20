@@ -1,5 +1,6 @@
 package com.kasiefm;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -59,6 +60,7 @@ public class RadioService extends Service {
         player.prepare();
 
         player.addListener(new Player.Listener() {
+            @SuppressLint("ForegroundServiceType")
             @Override
             public void onPlaybackStateChanged(int playbackState) {
                 if (playbackState == Player.STATE_READY) {
@@ -74,6 +76,7 @@ public class RadioService extends Service {
         });
     }
 
+    @SuppressLint("ForegroundServiceType")
     private void startRadio() {
         if (player != null) {
             player.setPlayWhenReady(true);
