@@ -10,14 +10,16 @@
         android:id="@+id/status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Status: Ready"
-        android:textSize="18sp"
-        android:layout_marginBottom="24dp" />
+        android:text="@string/kasie_fm"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="48dp"/>
 
     <Button
         android:id="@+id/play_pause_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play" />
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="@string/play"
+        android:textSize="24sp"/>
 
 </LinearLayout>
