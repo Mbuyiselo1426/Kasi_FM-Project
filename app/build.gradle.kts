@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kasifm"
+    namespace = "com.kasiefm"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.kasifm"
+        applicationId = "com.kasiefm"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
@@ -57,4 +58,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+  
 }

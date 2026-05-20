@@ -10,7 +10,7 @@
         android:id="@+id/status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/kasie_fm"
+        android:text="Kasie FM"
         android:textSize="32sp"
         android:textStyle="bold"
         android:layout_marginBottom="48dp"/>
@@ -19,7 +19,7 @@
         android:id="@+id/play_pause_button"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:text="@string/play"
+        android:text="Play"
         android:textSize="24sp"/>
 
 </LinearLayout>

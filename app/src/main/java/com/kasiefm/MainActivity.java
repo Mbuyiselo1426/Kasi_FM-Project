@@ -4,24 +4,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.media3.common.MediaItem;
-import androidx.media3.common.PlaybackException;
-import androidx.media3.common.Player;
-import androidx.media3.exoplayer.ExoPlayer;
 
-import com.kasifm.R;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ExoPlayer player;
+    private SimpleExoPlayer player;
     private boolean isPlaying = false;
     private Button playPauseButton;
     private TextView statusText;
 
-    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3"; // Replace later
+    // Test stream - replace with Kasie FM URL later
+    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,22 +48,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializePlayer() {
-        player = new ExoPlayer.Builder(this).build();
+        player = new SimpleExoPlayer.Builder(this).build();
         MediaItem mediaItem = MediaItem.fromUri(RADIO_STREAM_URL);
         player.setMediaItem(mediaItem);
 
         player.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int playbackState) {
-                if (playbackState == Player.STATE_READY) {
-                    statusText.setText("Ready to play");
-                } else if (playbackState == Player.STATE_BUFFERING) {
+                if (playbackState == Player.STATE_BUFFERING) {
                     statusText.setText("Buffering...");
+                } else if (playbackState == Player.STATE_READY) {
+                    statusText.setText("Ready to play");
                 }
             }
 
             @Override
-            public void onPlayerError(@NonNull PlaybackException error) {
+            public void onPlayerError(PlaybackException error) {
                 statusText.setText("Error: " + error.getMessage());
                 isPlaying = false;
                 updatePlayPauseButton();
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             player.setPlayWhenReady(true);
             isPlaying = true;
             updatePlayPauseButton();
-            statusText.setText("Playing Kasie FM");
+            statusText.setText("Playing...");
         }
     }
 
@@ -94,11 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updatePlayPauseButton() {
         if (playPauseButton != null) {
-            if (isPlaying) {
-                playPauseButton.setText("Pause");
-            } else {
-                playPauseButton.setText("Play");
-            }
+            playPauseButton.setText(isPlaying ? "Pause" : "Play");
         }
     }
 

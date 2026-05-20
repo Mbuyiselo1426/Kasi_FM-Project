@@ -1,4 +1,4 @@
-package com.kasifm
+package com.kasiefm
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
