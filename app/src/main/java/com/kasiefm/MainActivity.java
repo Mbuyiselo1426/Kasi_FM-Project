@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private Button playPauseButton;
     private TextView statusText;
 
-    private static final String RADIO_STREAM_URL = "https://example.com/radio-stream.mp3"; // Replace later
+    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3"; // Replace later
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

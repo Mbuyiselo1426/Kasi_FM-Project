@@ -21,7 +21,7 @@ public class RadioService extends Service {
     private ExoPlayer player;
     private static final String CHANNEL_ID = "RadioServiceChannel";
     private static final int NOTIFICATION_ID = 1;
-    private static final String RADIO_STREAM_URL = "https://stream.kasiefm.co.za/live";
+    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
 
     @Override
     public void onCreate() {
