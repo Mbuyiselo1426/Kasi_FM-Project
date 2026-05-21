@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#1a1a2e">
 
     <TextView
         android:id="@+id/status_text"
@@ -13,13 +14,16 @@
         android:text="Kasie FM"
         android:textSize="32sp"
         android:textStyle="bold"
-        android:layout_marginBottom="48dp"/>
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="32dp"/>
 
     <Button
         android:id="@+id/play_pause_button"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:text="Play"
-        android:textSize="24sp"/>
+        android:textSize="24sp"
+        android:backgroundTint="#9C27B0"
+        android:textColor="#FFFFFF"/>
 
 </LinearLayout>

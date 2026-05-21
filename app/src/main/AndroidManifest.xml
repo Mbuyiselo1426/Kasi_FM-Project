@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.kasiefm">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -22,8 +22,7 @@
         <service
             android:name=".RadioService"
             android:enabled="true"
-            android:exported="false"
-            tools:ignore="MissingClass" />
+            android:exported="false" />
 
     </application>
 
