@@ -12,11 +12,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 
-// Adding animation
-
-import android.os.Handler;
-import android.view.View;
-import java.util.Random;
+//Adding animation imports
 
 
 
