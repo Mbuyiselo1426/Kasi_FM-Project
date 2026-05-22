@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp"
     android:background="#1a1a2e">
-
     <!--volume slider-->
     <SeekBar
         android:id="@+id/volume_slider"
@@ -60,7 +60,6 @@
             android:background="#9C27B0"/>
 
     </LinearLayout>
-
     <!--station-logo-->
     <ImageView
         android:id="@+id/station_logo"
@@ -91,4 +90,13 @@
         android:backgroundTint="#9C27B0"
         android:textColor="#FFFFFF"/>
 
+
+
+
+
+
+
 </LinearLayout>
+
+
+
