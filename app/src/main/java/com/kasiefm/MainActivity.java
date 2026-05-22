@@ -1,5 +1,7 @@
 package com.kasiefm;
 
+
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,11 +12,20 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 
+// Adding animation
+
+import android.os.Handler;
+import android.view.View;
+import java.util.Random;
+
+
+
 public class MainActivity extends AppCompatActivity {
+
 
     private ExoPlayer player;
     private boolean isPlaying = false;
-    private Button playPauseButton;
+    private Button playPauseButton; //play button which triggers play
     private TextView statusText;
 
     private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
@@ -71,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         player.prepare();
     }
 
+
     private void playRadio() {
         if (player != null) {
             player.setPlayWhenReady(true);
@@ -79,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             statusText.setText("Playing...");
         }
     }
+
 
     private void pauseRadio() {
         if (player != null) {
@@ -98,3 +111,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+// Add with other imports
+
+
+
+// Add in onCreate after initializePlayer():
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

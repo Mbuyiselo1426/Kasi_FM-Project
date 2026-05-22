@@ -7,7 +7,71 @@
     android:padding="16dp"
     android:background="#1a1a2e">
 
+    <!--volume slider-->
+    <SeekBar
+        android:id="@+id/volume_slider"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:max="100"
+        android:progress="70"/>
+
+    <!--Animated-sound waves-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <View
+            android:id="@+id/bar1"
+            android:layout_width="8dp"
+            android:layout_height="10dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
+
+        <View
+            android:id="@+id/bar2"
+            android:layout_width="8dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
+
+        <View
+            android:id="@+id/bar3"
+            android:layout_width="8dp"
+            android:layout_height="30dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
+
+        <View
+            android:id="@+id/bar4"
+            android:layout_width="8dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
+
+        <View
+            android:id="@+id/bar5"
+            android:layout_width="8dp"
+            android:layout_height="10dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
+
+    </LinearLayout>
+
+    <!--station-logo-->
+    <ImageView
+        android:id="@+id/station_logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_radio"
+        android:contentDescription="Station Logo"/>
+
     <TextView
+
         android:id="@+id/status_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,6 +81,7 @@
         android:textColor="#FFFFFF"
         android:layout_marginBottom="32dp"/>
 
+    <!--Button-->
     <Button
         android:id="@+id/play_pause_button"
         android:layout_width="120dp"
