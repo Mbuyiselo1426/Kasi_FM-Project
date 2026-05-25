@@ -1,5 +1,5 @@
 package com.kasiefm;
-
+import android.widget.SeekBar;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -23,13 +23,21 @@ public class MainActivity extends AppCompatActivity {
     private Random random = new Random();
 
     private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
+    private TextView nowPlayingTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //added Actionbar
+        // Hide the ActionBar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         playPauseButton = findViewById(R.id.play_pause_button);
+        nowPlayingTitle = findViewById(R.id.now_playing_title); //added nowPlayingTitle
         statusText = findViewById(R.id.status_text);
 
         // Initialize animated bars
@@ -40,6 +48,25 @@ public class MainActivity extends AppCompatActivity {
         bar5 = findViewById(R.id.bar5);
 
         initializePlayer();
+
+        // Volume Slider
+        SeekBar volumeSlider = findViewById(R.id.volume_slider);
+        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && player != null) {
+                    float volume = progress / 100f;
+                    player.setVolume(volume);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (playbackState == Player.STATE_BUFFERING) {
                         statusText.setText("Buffering...");
+                        nowPlayingTitle.setText("Loading stream...");
+
                     } else if (playbackState == Player.STATE_READY) {
                         statusText.setText("Ready to play");
                     }
@@ -83,13 +112,18 @@ public class MainActivity extends AppCompatActivity {
         player.prepare();
     }
 
+
     private void playRadio() {
         if (player != null) {
             player.setPlayWhenReady(true);
             isPlaying = true;
             playPauseButton.setText("Pause");
             statusText.setText("Playing...");
+            nowPlayingTitle.setText("Kasie FM Live");// added nowPlayingTitle.setText
             startWaveAnimation();  // Start animation when playing
+
+
+
         }
     }
 
@@ -99,7 +133,9 @@ public class MainActivity extends AppCompatActivity {
             isPlaying = false;
             playPauseButton.setText("Play");
             statusText.setText("Paused");
+            nowPlayingTitle.setText("Paused"); // added nowPlayingTitle.setText
             stopWaveAnimation();  // Stop animation when paused
+
         }
     }
 
