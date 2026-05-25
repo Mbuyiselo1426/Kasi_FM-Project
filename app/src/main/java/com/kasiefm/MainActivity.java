@@ -1,9 +1,10 @@
 package com.kasiefm;
-import android.widget.SeekBar;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -23,21 +24,19 @@ public class MainActivity extends AppCompatActivity {
     private Random random = new Random();
 
     private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
-    private TextView nowPlayingTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //added Actionbar
-        // Hide the ActionBar
+        // Hide ActionBar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
+        // Initialize views
         playPauseButton = findViewById(R.id.play_pause_button);
-        nowPlayingTitle = findViewById(R.id.now_playing_title); //added nowPlayingTitle
         statusText = findViewById(R.id.status_text);
 
         // Initialize animated bars
@@ -51,23 +50,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Volume Slider
         SeekBar volumeSlider = findViewById(R.id.volume_slider);
-        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && player != null) {
-                    float volume = progress / 100f;
-                    player.setVolume(volume);
+        if (volumeSlider != null) {
+            volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if (fromUser && player != null) {
+                        float volume = progress / 100f;
+                        player.setVolume(volume);
+                    }
                 }
-            }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+        }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-
+        // Play/Pause button
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,10 +90,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (playbackState == Player.STATE_BUFFERING) {
                         statusText.setText("Buffering...");
-                        nowPlayingTitle.setText("Loading stream...");
-
                     } else if (playbackState == Player.STATE_READY) {
-                        statusText.setText("Ready to play");
+                        statusText.setText("Kasie FM");
                     }
                 });
             }
@@ -112,18 +109,13 @@ public class MainActivity extends AppCompatActivity {
         player.prepare();
     }
 
-
     private void playRadio() {
         if (player != null) {
             player.setPlayWhenReady(true);
             isPlaying = true;
             playPauseButton.setText("Pause");
             statusText.setText("Playing...");
-            nowPlayingTitle.setText("Kasie FM Live");// added nowPlayingTitle.setText
-            startWaveAnimation();  // Start animation when playing
-
-
-
+            startWaveAnimation();
         }
     }
 
@@ -133,9 +125,7 @@ public class MainActivity extends AppCompatActivity {
             isPlaying = false;
             playPauseButton.setText("Play");
             statusText.setText("Paused");
-            nowPlayingTitle.setText("Paused"); // added nowPlayingTitle.setText
-            stopWaveAnimation();  // Stop animation when paused
-
+            stopWaveAnimation();
         }
     }
 
@@ -144,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (isPlaying) {
-                    // Random heights for animation
                     bar1.getLayoutParams().height = 10 + random.nextInt(40);
                     bar2.getLayoutParams().height = 10 + random.nextInt(50);
                     bar3.getLayoutParams().height = 10 + random.nextInt(60);
@@ -157,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     bar4.requestLayout();
                     bar5.requestLayout();
 
-                    startWaveAnimation(); // Continue animation
+                    startWaveAnimation();
                 }
             }
         }, 200);
@@ -165,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopWaveAnimation() {
         animHandler.removeCallbacksAndMessages(null);
-        // Reset to default heights
         bar1.getLayoutParams().height = 10;
         bar2.getLayoutParams().height = 20;
         bar3.getLayoutParams().height = 30;

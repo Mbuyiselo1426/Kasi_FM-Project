@@ -1,148 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="#1a1a2e">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- Station Logo -->
+    <ImageView
+        android:id="@+id/station_logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/kasi_fm_logo"
+        android:contentDescription="Station Logo"/>
+
+    <!-- Status Text -->
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp"
-        android:background="@drawable/gradient_background">
+        android:text="Kasie FM"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="32dp"/>
 
-        <!-- Station Logo -->
-        <ImageView
-            android:id="@+id/station_logo"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/kasi_fm_logo"
-            android:contentDescription="Station Logo"/>
+    <!-- Play Button -->
+    <Button
+        android:id="@+id/play_pause_button"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:text="Play"
+        android:textSize="24sp"
+        android:backgroundTint="#9C27B0"
+        android:textColor="#FFFFFF"/>
 
-        <!-- Station Name / Status -->
-        <TextView
-            android:id="@+id/status_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kasie FM"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="32dp"/>
+    <!-- Animated Waves -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="center">
 
-        <!-- Play/Pause Button -->
-        <Button
-            android:id="@+id/play_pause_button"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:text="Play"
-            android:textSize="24sp"
-            android:backgroundTint="#9C27B0"
-            android:textColor="#FFFFFF"/>
+        <View
+            android:id="@+id/bar1"
+            android:layout_width="8dp"
+            android:layout_height="10dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
 
-        <!-- Animated Sound Waves -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+        <View
+            android:id="@+id/bar2"
+            android:layout_width="8dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
 
-            <View
-                android:id="@+id/bar1"
-                android:layout_width="8dp"
-                android:layout_height="10dp"
-                android:layout_margin="3dp"
-                android:background="#9C27B0"/>
+        <View
+            android:id="@+id/bar3"
+            android:layout_width="8dp"
+            android:layout_height="30dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
 
-            <View
-                android:id="@+id/bar2"
-                android:layout_width="8dp"
-                android:layout_height="20dp"
-                android:layout_margin="3dp"
-                android:background="#9C27B0"/>
+        <View
+            android:id="@+id/bar4"
+            android:layout_width="8dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
 
-            <View
-                android:id="@+id/bar3"
-                android:layout_width="8dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:background="#9C27B0"/>
-
-            <View
-                android:id="@+id/bar4"
-                android:layout_width="8dp"
-                android:layout_height="20dp"
-                android:layout_margin="3dp"
-                android:background="#9C27B0"/>
-
-            <View
-                android:id="@+id/bar5"
-                android:layout_width="8dp"
-                android:layout_height="10dp"
-                android:layout_margin="3dp"
-                android:background="#9C27B0"/>
-
-        </LinearLayout>
-
-        <!-- Volume Label -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Volume"
-            android:textColor="#FFFFFF"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Volume Slider (only ONE) -->
-        <SeekBar
-            android:id="@+id/volume_slider"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="70"
-            android:progressTint="#9C27B0"/>
-
-        <!-- Now Playing Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardBackgroundColor="#33000000">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NOW PLAYING"
-                    android:textSize="12sp"
-                    android:textColor="#99FFFFFF"/>
-
-                <TextView
-                    android:id="@+id/now_playing_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Kasie FM Live"
-                    android:textSize="16sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_marginTop="4dp"/>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+        <View
+            android:id="@+id/bar5"
+            android:layout_width="8dp"
+            android:layout_height="10dp"
+            android:layout_margin="3dp"
+            android:background="#9C27B0"/>
 
     </LinearLayout>
 
-</ScrollView>
+    <!-- Volume Label -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Volume"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Volume Slider -->
+    <SeekBar
+        android:id="@+id/volume_slider"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="70"
+        android:progressTint="#9C27B0"/>
+
+</LinearLayout>
