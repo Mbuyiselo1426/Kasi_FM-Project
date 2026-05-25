@@ -60,6 +60,23 @@
             android:layout_margin="3dp"
             android:background="#9C27B0"/>
 
+        <!-- Volume Control -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Volume"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"/>
+
+        <SeekBar
+            android:id="@+id/volume_slider"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="70"
+            android:progressTint="#9C27B0"/>
+
     </LinearLayout>
     <!--station-logo-->
     <ImageView
