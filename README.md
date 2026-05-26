@@ -37,3 +37,28 @@ As a student developer, AI tools help me:
 - Add "Data Lite" mode for low-data usage
 - Implement song request feature via WhatsApp
 - Add push notifications for show reminders
+
+
+
+-Added the UI design 
+  ┌─────────────────────────────────┐
+  │  [🏴] KASIE FM                  │  ← Logo + text
+  ├─────────────────────────────────┤
+  │                                 │
+  │      [ LISTEN NOW ]             │  ← Pink button
+  │                                 │
+  │  ┌─────────────────────────┐    │
+  │  │ NOW PLAYING             │    │
+  │  │ Kasie FM Live           │    │
+  │  │ Kasie FM                │    │
+  │  └─────────────────────────┘    │
+  │                                 │
+  │  ┌─────────────────────────┐    │
+  │  │ NOW ON AIR              │    │
+  │  │ #HomeDrive              │    │
+  │  │ 15:00 - 18:00           │    │
+  │  └─────────────────────────┘    │
+  │                                 │
+  ├─────────────────────────────────┤
+  │ KASIE FM | FEATURED | HIGHLIGHTS | NEWS │
+  └─────────────────────────────────┘
