@@ -47,6 +47,7 @@ dependencies {
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation(platform(libs.androidx.compose.bom))
 
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)

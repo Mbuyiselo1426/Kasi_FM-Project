@@ -2,11 +2,14 @@ package com.kasiefm;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
@@ -17,9 +20,11 @@ public class MainActivity extends AppCompatActivity {
 
     private ExoPlayer player;
     private boolean isPlaying = false;
-    private Button playPauseButton;
-    private TextView statusText;
-    private View bar1, bar2, bar3, bar4, bar5;
+    private Button listenNowButton;
+    private TextView titleText;
+    private TextView artistText;
+    private TextView showTitle;
+    private TextView showTime;
     private Handler animHandler = new Handler();
     private Random random = new Random();
 
@@ -30,51 +35,70 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Hide ActionBar
+        // Setup Toolbar (Top Navbar)
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Hide default ActionBar title, we set our own in toolbar
         if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
         // Initialize views
-        playPauseButton = findViewById(R.id.play_pause_button);
-        statusText = findViewById(R.id.status_text);
+        listenNowButton = findViewById(R.id.play_pause_button);
+        titleText = findViewById(R.id.title_text);
+        artistText = findViewById(R.id.artist_text);
+        showTitle = findViewById(R.id.show_title);
+        showTime = findViewById(R.id.show_time);
 
-        // Initialize animated bars
-        bar1 = findViewById(R.id.bar1);
-        bar2 = findViewById(R.id.bar2);
-        bar3 = findViewById(R.id.bar3);
-        bar4 = findViewById(R.id.bar4);
-        bar5 = findViewById(R.id.bar5);
+        // Set initial schedule info
+        showTitle.setText("#HomeDrive");
+        showTime.setText("15:00 - 18:00");
 
         initializePlayer();
 
-        // Volume Slider
-        SeekBar volumeSlider = findViewById(R.id.volume_slider);
-        if (volumeSlider != null) {
-            volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser && player != null) {
-                        float volume = progress / 100f;
-                        player.setVolume(volume);
-                    }
-                }
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
-            });
-        }
+        // Listen Now button
+        listenNowButton.setOnClickListener(v -> {
+            if (isPlaying) {
+                pauseRadio();
+            } else {
+                playRadio();
+            }
+        });
 
-        // Play/Pause button
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
+        // Bottom Navigation
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if (isPlaying) {
-                    pauseRadio();
-                } else {
-                    playRadio();
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.nav_home) {
+                    titleText.setText("Kasie FM Live");
+                    artistText.setText("Kasie FM");
+                    showTitle.setText("#HomeDrive");
+                    showTime.setText("15:00 - 18:00");
+                    return true;
+                } else if (id == R.id.nav_featured) {
+                    titleText.setText("Featured Segment");
+                    artistText.setText("Best of Kasie FM");
+                    showTitle.setText("#Throwback");
+                    showTime.setText("18:00 - 20:00");
+                    return true;
+                } else if (id == R.id.nav_highlights) {
+                    titleText.setText("Today's Highlights");
+                    artistText.setText("Top Moments");
+                    showTitle.setText("#Highlights");
+                    showTime.setText("20:00 - 22:00");
+                    return true;
+                } else if (id == R.id.nav_news) {
+                    titleText.setText("Kasie FM News");
+                    artistText.setText("Community Updates");
+                    showTitle.setText("#NewsHour");
+                    showTime.setText("22:00 - 00:00");
+                    return true;
                 }
+                return false;
             }
         });
     }
@@ -89,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
             public void onPlaybackStateChanged(int playbackState) {
                 runOnUiThread(() -> {
                     if (playbackState == Player.STATE_BUFFERING) {
-                        statusText.setText("Buffering...");
+                        listenNowButton.setText("BUFFERING...");
                     } else if (playbackState == Player.STATE_READY) {
-                        statusText.setText("Kasie FM");
+                        listenNowButton.setText("LISTEN NOW");
                     }
                 });
             }
@@ -99,9 +123,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPlayerError(PlaybackException error) {
                 runOnUiThread(() -> {
-                    statusText.setText("Error");
+                    listenNowButton.setText("ERROR - TAP TO RETRY");
                     isPlaying = false;
-                    playPauseButton.setText("Play");
                 });
             }
         });
@@ -113,9 +136,9 @@ public class MainActivity extends AppCompatActivity {
         if (player != null) {
             player.setPlayWhenReady(true);
             isPlaying = true;
-            playPauseButton.setText("Pause");
-            statusText.setText("Playing...");
-            startWaveAnimation();
+            listenNowButton.setText("PAUSE");
+            titleText.setText("Kasie FM Live");
+            artistText.setText("Kasie FM");
         }
     }
 
@@ -123,47 +146,10 @@ public class MainActivity extends AppCompatActivity {
         if (player != null) {
             player.setPlayWhenReady(false);
             isPlaying = false;
-            playPauseButton.setText("Play");
-            statusText.setText("Paused");
-            stopWaveAnimation();
+            listenNowButton.setText("LISTEN NOW");
+            titleText.setText("Paused");
+            artistText.setText("Tap play to resume");
         }
-    }
-
-    private void startWaveAnimation() {
-        animHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isPlaying) {
-                    bar1.getLayoutParams().height = 10 + random.nextInt(40);
-                    bar2.getLayoutParams().height = 10 + random.nextInt(50);
-                    bar3.getLayoutParams().height = 10 + random.nextInt(60);
-                    bar4.getLayoutParams().height = 10 + random.nextInt(50);
-                    bar5.getLayoutParams().height = 10 + random.nextInt(40);
-
-                    bar1.requestLayout();
-                    bar2.requestLayout();
-                    bar3.requestLayout();
-                    bar4.requestLayout();
-                    bar5.requestLayout();
-
-                    startWaveAnimation();
-                }
-            }
-        }, 200);
-    }
-
-    private void stopWaveAnimation() {
-        animHandler.removeCallbacksAndMessages(null);
-        bar1.getLayoutParams().height = 10;
-        bar2.getLayoutParams().height = 20;
-        bar3.getLayoutParams().height = 30;
-        bar4.getLayoutParams().height = 20;
-        bar5.getLayoutParams().height = 10;
-        bar1.requestLayout();
-        bar2.requestLayout();
-        bar3.requestLayout();
-        bar4.requestLayout();
-        bar5.requestLayout();
     }
 
     @Override
@@ -173,6 +159,5 @@ public class MainActivity extends AppCompatActivity {
             player.release();
             player = null;
         }
-        stopWaveAnimation();
     }
 }
