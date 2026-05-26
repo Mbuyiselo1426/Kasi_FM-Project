@@ -46,7 +46,8 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation(platform(libs.androidx.compose.bom))
-
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.9.0")
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
