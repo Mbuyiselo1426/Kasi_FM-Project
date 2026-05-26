@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#E91E63"
+        android:background="#87CEEB"
         android:paddingTop = "25dp">  <!-- Add this line for status bar space -->
 
         <LinearLayout
@@ -60,8 +60,7 @@
                 android:text="LISTEN NOW"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:backgroundTint="#E91E63"
-                android:textColor="#FFFFFF"
+                android:backgroundTint="#87CEEB"
                 android:layout_marginBottom="24dp"/>
 
             <!-- Now Playing Section -->
