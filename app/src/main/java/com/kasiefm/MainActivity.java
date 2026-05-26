@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                         listenNowButton.setText("LISTEN NOW");
                     }
                 });
-
+            }
 
             @Override
             public void onPlayerError(PlaybackException error) {
