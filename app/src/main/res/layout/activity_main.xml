@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/gradient_bg">
+    android:background="#1a1a2e">
 
-    <!-- ===== TOP NAVBAR ===== -->
+    <!-- Top Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#9C27B0"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:background="#9C27B0">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +23,7 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- ===== SCROLLABLE CONTENT ===== -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -50,109 +48,137 @@
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Now Playing Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Now Playing Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#33000000"
-                app:cardElevation="4dp">
+                android:background="#33000000"
+                android:padding="16dp"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="NOW PLAYING"
+                    android:textSize="12sp"
+                    android:textColor="#99FFFFFF"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NOW PLAYING"
-                        android:textSize="12sp"
-                        android:textColor="#99FFFFFF"/>
+                <TextView
+                    android:id="@+id/title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kasie FM Live"
+                    android:textSize="22sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"/>
 
-                    <TextView
-                        android:id="@+id/title_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Kasie FM Live"
-                        android:textSize="22sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/artist_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kasie FM"
+                    android:textSize="16sp"
+                    android:textColor="#CCFFFFFF"
+                    android:layout_marginTop="4dp"/>
 
-                    <TextView
-                        android:id="@+id/artist_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Kasie FM"
-                        android:textSize="16sp"
-                        android:textColor="#CCFFFFFF"
-                        android:layout_marginTop="4dp"/>
+            </LinearLayout>
 
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Now On Air Card -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- Now On Air Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#33000000"
-                app:cardElevation="4dp">
+                android:background="#33000000"
+                android:padding="16dp"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="NOW ON AIR"
+                    android:textSize="12sp"
+                    android:textColor="#99FFFFFF"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="NOW ON AIR"
-                        android:textSize="12sp"
-                        android:textColor="#99FFFFFF"/>
+                <TextView
+                    android:id="@+id/show_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#HomeDrive"
+                    android:textSize="20sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"/>
 
-                    <TextView
-                        android:id="@+id/show_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="#HomeDrive"
-                        android:textSize="20sp"
-                        android:textColor="#FFFFFF"
-                        android:textStyle="bold"
-                        android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/show_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15:00 - 18:00"
+                    android:textSize="14sp"
+                    android:textColor="#CCFFFFFF"
+                    android:layout_marginTop="4dp"/>
 
-                    <TextView
-                        android:id="@+id/show_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="15:00 - 18:00"
-                        android:textSize="14sp"
-                        android:textColor="#CCFFFFFF"
-                        android:layout_marginTop="4dp"/>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
 
-    <!-- ===== BOTTOM NAVIGATION ===== -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <!-- Bottom Navigation -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:background="#1a1a2e"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="#FFFFFF"
-        app:itemTextColor="#FFFFFF"
-        app:itemBackground="@android:color/transparent"/>
+        android:gravity="center"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/nav_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="KASIE FM"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/nav_featured"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="FEATURED"
+            android:textColor="#99FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/nav_highlights"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="HIGHLIGHTS"
+            android:textColor="#99FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/nav_news"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="NEWS"
+            android:textColor="#99FFFFFF"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:padding="8dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>
