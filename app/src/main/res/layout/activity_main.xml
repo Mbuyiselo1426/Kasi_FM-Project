@@ -10,7 +10,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#E91E63">
+        android:background="#E91E63"
+        android:paddingTop = "25dp">  <!-- Add this line for status bar space -->
 
         <LinearLayout
             android:layout_width="match_parent"
