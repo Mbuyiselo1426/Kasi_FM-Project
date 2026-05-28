@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
         // Navigation clicks
         navHome.setOnClickListener(v -> {
             titleText.setText("Kasie FM Live");

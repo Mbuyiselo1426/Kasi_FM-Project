@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#87CEEB"
-        android:paddingTop = "25dp">  <!-- Add this line for status bar space -->
+        android:paddingTop="25dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,7 +26,7 @@
                 android:layout_height="32dp"
                 android:src="@drawable/kasi_fm_logo"
                 android:contentDescription="Kasie FM Logo"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -33,13 +34,13 @@
                 android:text="KASIE FM"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Scrollable Content -->
+    <!-- Scrollable Content (FIXED: ScrollView now properly wraps everything) -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -49,35 +50,72 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <!-- Listen Now Button -->
-            <Button
-                android:id="@+id/play_pause_button"
+            <!-- Modern Play Button Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="LISTEN NOW"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:backgroundTint="#87CEEB"
-                android:layout_marginBottom="24dp"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp">
+
+                <!-- Station Frequency Badge -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LIVE"
+                    android:textSize="12sp"
+                    android:textColor="#FF5722"
+                    android:background="@drawable/live_badge_background"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Circular Play/Pause Button -->
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/playPauseButton"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_play_arrow_24dp"
+                    app:fabSize="normal"
+                    android:backgroundTint="#87CEEB"
+                    app:tint="#FFFFFF"
+                    app:elevation="4dp" />
+
+                <!-- 97.1 FM Text -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="97.1 FM"
+                    android:textSize="14sp"
+                    android:textColor="#87CEEB"
+                    android:layout_marginTop="12dp"
+                    android:letterSpacing="0.1" />
+
+            </LinearLayout>
 
             <!-- Now Playing Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
                 android:background="#1A1A2E"
                 android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:radius="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NOW PLAYING"
                     android:textSize="12sp"
-                    android:textColor="#99FFFFFF"/>
+                    android:textColor="#99FFFFFF" />
 
                 <TextView
                     android:id="@+id/title_text"
@@ -87,7 +125,7 @@
                     android:textSize="22sp"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_marginTop="8dp" />
 
                 <TextView
                     android:id="@+id/artist_text"
@@ -96,7 +134,7 @@
                     android:text="Kasie FM"
                     android:textSize="16sp"
                     android:textColor="#CCFFFFFF"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp" />
 
             </LinearLayout>
 
@@ -104,17 +142,20 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
                 android:background="#1A1A2E"
                 android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:radius="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NOW ON AIR"
                     android:textSize="12sp"
-                    android:textColor="#99FFFFFF"/>
+                    android:textColor="#99FFFFFF" />
 
                 <TextView
                     android:id="@+id/show_title"
@@ -124,7 +165,7 @@
                     android:textSize="20sp"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
-                    android:layout_marginTop="8dp"/>
+                    android:layout_marginTop="8dp" />
 
                 <TextView
                     android:id="@+id/show_time"
@@ -133,7 +174,7 @@
                     android:text="15:00 - 18:00"
                     android:textSize="14sp"
                     android:textColor="#CCFFFFFF"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="4dp" />
 
             </LinearLayout>
 
@@ -159,7 +200,7 @@
             android:textColor="#E91E63"
             android:textSize="12sp"
             android:gravity="center"
-            android:padding="8dp"/>
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/nav_featured"
@@ -170,7 +211,7 @@
             android:textColor="#99FFFFFF"
             android:textSize="12sp"
             android:gravity="center"
-            android:padding="8dp"/>
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/nav_highlights"
@@ -181,7 +222,7 @@
             android:textColor="#99FFFFFF"
             android:textSize="12sp"
             android:gravity="center"
-            android:padding="8dp"/>
+            android:padding="8dp" />
 
         <TextView
             android:id="@+id/nav_news"
@@ -192,7 +233,7 @@
             android:textColor="#99FFFFFF"
             android:textSize="12sp"
             android:gravity="center"
-            android:padding="8dp"/>
+            android:padding="8dp" />
 
     </LinearLayout>
 
