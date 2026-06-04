@@ -2,26 +2,27 @@ package com.kasiefm;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
     private ExoPlayer player;
     private boolean isPlaying = false;
-    private FloatingActionButton playPauseButton;  // Changed from Button to FAB
+    private Button playPauseButton;  // Changed from FAB to Button
     private TextView titleText;
     private TextView artistText;
     private TextView showTitle;
     private TextView showTime;
     private TextView navHome, navFeatured, navHighlights, navNews;
-    private TextView liveBadge;  // Optional: to change LIVE badge text/color
+    private TextView liveBadge;
 
     private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
 
@@ -38,13 +39,13 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        // Initialize views - UPDATED for modern design
-        playPauseButton = findViewById(R.id.playPauseButton);  // Changed ID to match XML
+        // Initialize views
+        playPauseButton = findViewById(R.id.playPauseButton);
         titleText = findViewById(R.id.title_text);
         artistText = findViewById(R.id.artist_text);
         showTitle = findViewById(R.id.show_title);
         showTime = findViewById(R.id.show_time);
-        liveBadge = findViewById(R.id.live_badge);  // Optional: add this to your XML
+        liveBadge = findViewById(R.id.live_badge);
 
         // Navigation TextViews
         navHome = findViewById(R.id.nav_home);
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         initializePlayer();
 
-        // Modern play button click listener
+        // Play button click listener
         playPauseButton.setOnClickListener(v -> {
             if (isPlaying) {
                 pauseRadio();
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Navigation clicks (keeping your existing logic)
+        // Navigation clicks
         navHome.setOnClickListener(v -> {
             titleText.setText("Kasie FM Live");
             artistText.setText("Kasie FM");
@@ -111,17 +112,14 @@ public class MainActivity extends AppCompatActivity {
             public void onPlaybackStateChanged(int playbackState) {
                 runOnUiThread(() -> {
                     if (playbackState == Player.STATE_BUFFERING) {
-                        // Change FAB icon to buffering state (optional)
                         playPauseButton.setEnabled(false);
                         if (liveBadge != null) {
                             liveBadge.setText("BUFFERING");
-                            liveBadge.setBackgroundColor(getColor(android.R.color.holo_orange_dark));
                         }
                     } else if (playbackState == Player.STATE_READY) {
                         playPauseButton.setEnabled(true);
                         if (liveBadge != null) {
                             liveBadge.setText("LIVE");
-                            liveBadge.setBackgroundColor(getColor(android.R.color.holo_orange_dark));
                         }
                     }
                 });
@@ -132,10 +130,9 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     playPauseButton.setEnabled(true);
                     isPlaying = false;
-                    playPauseButton.setImageResource(R.drawable.ic_play_arrow_24dp);
+                    playPauseButton.setText("▶");
                     if (liveBadge != null) {
                         liveBadge.setText("OFFLINE");
-                        liveBadge.setBackgroundColor(getColor(android.R.color.holo_red_dark));
                     }
                     titleText.setText("Connection Error");
                     artistText.setText("Tap to retry");
@@ -150,23 +147,11 @@ public class MainActivity extends AppCompatActivity {
         if (player != null) {
             player.setPlayWhenReady(true);
             isPlaying = true;
-            // Change FAB icon to pause
-            playPauseButton.setImageResource(R.drawable.ic_pause_24dp);
-            // Add scale animation
-            playPauseButton.animate()
-                    .scaleX(1.1f)
-                    .scaleY(1.1f)
-                    .setDuration(200)
-                    .withEndAction(() -> playPauseButton.animate()
-                            .scaleX(1f)
-                            .scaleY(1f)
-                            .setDuration(200)
-                            .start());
+            playPauseButton.setText("⏸");
 
             titleText.setText("Kasie FM Live");
             artistText.setText("Kasie FM");
 
-            // Optional: Change LIVE badge to animating state
             if (liveBadge != null) {
                 liveBadge.setText("LIVE");
             }
@@ -177,8 +162,7 @@ public class MainActivity extends AppCompatActivity {
         if (player != null) {
             player.setPlayWhenReady(false);
             isPlaying = false;
-            // Change FAB icon to play
-            playPauseButton.setImageResource(R.drawable.ic_play_arrow_24dp);
+            playPauseButton.setText("▶");
 
             titleText.setText("Paused");
             artistText.setText("Tap play to resume");
@@ -187,13 +171,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavigationColors(int activeNavId) {
         // Reset all navigation colors to gray
-        navHome.setTextColor(getColor(android.R.color.darker_gray));
-        navFeatured.setTextColor(getColor(android.R.color.darker_gray));
-        navHighlights.setTextColor(getColor(android.R.color.darker_gray));
-        navNews.setTextColor(getColor(android.R.color.darker_gray));
+        navHome.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
+        navFeatured.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
+        navHighlights.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
+        navNews.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
 
-        // Set active navigation color to pink (E91E63) or sky blue (87CEEB)
-        int activeColor = getColor(android.R.color.white); // or use a custom color
+        // Set active navigation color to white
+        int activeColor = ContextCompat.getColor(this, android.R.color.white);
 
         if (activeNavId == R.id.nav_home) {
             navHome.setTextColor(activeColor);

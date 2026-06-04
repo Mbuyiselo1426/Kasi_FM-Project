@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -40,7 +40,7 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Scrollable Content (FIXED: ScrollView now properly wraps everything) -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -50,9 +50,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <!-- Modern Play Button Section -->
+            <!-- Play Button Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,30 +62,32 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp">
 
-                <!-- Station Frequency Badge -->
+                <!-- LIVE Badge -->
                 <TextView
+                    android:id="@+id/live_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="LIVE"
                     android:textSize="12sp"
-                    android:textColor="#FF5722"
-                    android:background="@drawable/live_badge_background"
+                    android:textColor="#FFFFFF"
+                    android:background="#FF5722"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
                     android:paddingTop="4dp"
                     android:paddingBottom="4dp"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center" />
 
-                <!-- Circular Play/Pause Button -->
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                <!-- Play/Pause Button (Standard Button, not FAB) -->
+                <Button
                     android:id="@+id/playPauseButton"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:src="@drawable/ic_play_arrow_24dp"
-                    app:fabSize="normal"
+                    android:text="▶"
+                    android:textSize="32sp"
                     android:backgroundTint="#87CEEB"
-                    app:tint="#FFFFFF"
-                    app:elevation="4dp" />
+                    android:textColor="#FFFFFF"
+                    android:stateListAnimator="@null" />
 
                 <!-- 97.1 FM Text -->
                 <TextView
@@ -93,8 +96,7 @@
                     android:text="97.1 FM"
                     android:textSize="14sp"
                     android:textColor="#87CEEB"
-                    android:layout_marginTop="12dp"
-                    android:letterSpacing="0.1" />
+                    android:layout_marginTop="12dp" />
 
             </LinearLayout>
 
@@ -102,13 +104,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="#1A1A2E"
                 android:padding="16dp"
-                android:orientation="vertical"
-                android:radius="16dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -119,7 +118,7 @@
 
                 <TextView
                     android:id="@+id/title_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Kasie FM Live"
                     android:textSize="22sp"
@@ -129,7 +128,7 @@
 
                 <TextView
                     android:id="@+id/artist_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Kasie FM"
                     android:textSize="16sp"
@@ -142,39 +141,36 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:layout_marginBottom="24dp"
                 android:background="#1A1A2E"
-                android:padding="16dp"
                 android:orientation="vertical"
-                android:radius="16dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NOW ON AIR"
-                    android:textSize="12sp"
-                    android:textColor="#99FFFFFF" />
+                    android:textColor="#99FFFFFF"
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/show_title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="#HomeDrive"
-                    android:textSize="20sp"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_marginTop="8dp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/show_time"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:text="15:00 - 18:00"
-                    android:textSize="14sp"
                     android:textColor="#CCFFFFFF"
-                    android:layout_marginTop="4dp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -197,7 +193,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="KASIE FM"
-            android:textColor="#E91E63"
+            android:textColor="#FFFFFF"
             android:textSize="12sp"
             android:gravity="center"
             android:padding="8dp" />
@@ -208,7 +204,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="FEATURED"
-            android:textColor="#99FFFFFF"
+            android:textColor="#666666"
             android:textSize="12sp"
             android:gravity="center"
             android:padding="8dp" />
@@ -219,7 +215,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="HIGHLIGHTS"
-            android:textColor="#99FFFFFF"
+            android:textColor="#666666"
             android:textSize="12sp"
             android:gravity="center"
             android:padding="8dp" />
@@ -230,7 +226,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="NEWS"
-            android:textColor="#99FFFFFF"
+            android:textColor="#666666"
             android:textSize="12sp"
             android:gravity="center"
             android:padding="8dp" />
