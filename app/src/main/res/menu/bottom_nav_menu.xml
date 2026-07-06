@@ -3,22 +3,22 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@drawable/ic_nav_home"
         android:title="KASIE FM"/>
 
     <item
         android:id="@+id/nav_featured"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@drawable/ic_nav_featured"
         android:title="FEATURED"/>
 
     <item
         android:id="@+id/nav_highlights"
-        android:icon="@android:drawable/ic_menu_recent_history"
+        android:icon="@drawable/ic_nav_highlights"
         android:title="HIGHLIGHTS"/>
 
     <item
         android:id="@+id/nav_news"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_nav_news"
         android:title="NEWS"/>
 
 </menu>

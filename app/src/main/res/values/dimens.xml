@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Simple type scale — use these instead of ad-hoc sp values -->
+    <dimen name="text_overline">11sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_title">18sp</dimen>
+    <dimen name="text_headline">22sp</dimen>
+
+    <!-- Spacing -->
+    <dimen name="spacing_standard">16dp</dimen>
+    <dimen name="spacing_section">24dp</dimen>
+
+</resources>

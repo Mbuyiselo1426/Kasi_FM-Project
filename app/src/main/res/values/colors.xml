@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="sky_blue">#87CEEB</color>
-    <color name="dark_background">#0D1117</color>
-    <color name="card_background">#1A1A2E</color>
-    <color name="white">#FFFFFF</color>
-    <color name="gray">#CCFFFFFF</color>
+
+    <!-- Core brand palette (black/yellow — confirmed against kasiefm971.co.za) -->
+    <color name="kasie_background">#0D1117</color>
+    <color name="kasie_toolbar">#000000</color>
+    <color name="kasie_accent">#EEC61F</color>
+    <color name="kasie_card_background">#1A1A2E</color>
+
+    <!-- "NOW ON AIR" badge — was #87CEEB (sky blue), which didn't relate to the
+         black/yellow brand at all. Replaced with a dark pill (background color)
+         + yellow text, so the badge reads as "inverted brand", not a third hue.
+         Alternative considered: a deep goldenrod pill (#B8860B) with white text —
+         see note in the response for the tradeoff. -->
+    <color name="kasie_badge_background">#0D1117</color>
+    <color name="kasie_badge_text">#EEC61F</color>
+    <color name="kasie_badge_alt_background">#B8860B</color>
+
+    <!-- Text -->
+    <color name="kasie_text_primary">#FFFFFF</color>
+    <color name="kasie_text_secondary">#CCFFFFFF</color>
+    <color name="kasie_text_muted">#99FFFFFF</color>
+    <color name="kasie_text_on_accent">#0D0F0F</color>
+
+    <!-- Play button -->
+    <color name="kasie_play_button_background">#0A0A0A</color>
+
+    <!-- Bottom navigation -->
+    <color name="kasie_nav_inactive">#8A8FA3</color>
+
 </resources>

@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">KasiStream</string>
     <string name="kasie_fm_logo">Kasie FM Logo</string>
+    <string name="play_action">Play</string>
+    <string name="pause_action">Pause</string>
 </resources>
