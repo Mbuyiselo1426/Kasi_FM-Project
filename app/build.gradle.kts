@@ -38,6 +38,11 @@ dependencies {
     implementation("com.google.android.exoplayer:exoplayer:2.18.7")
     implementation("com.google.android.material:material:1.9.0")  // ← add this
 
+    // Retrofit + Gson for talking to the Kasie FM API
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     testImplementation("junit:junit:4.13.2")
 
 }
