@@ -1,194 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:background="@color/kasie_background">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Top Toolbar with Logo -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="67dp"
-        android:background="@color/kasie_toolbar">
+    <uses-permission android:name="android.permission.INTERNET" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="KasiStream"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
-            <ImageView
-                android:id="@+id/toolbar_logo"
-                android:layout_width="101dp"
-                android:layout_height="70dp"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@string/kasie_fm_logo"
-                android:src="@drawable/kasi_fm_logo" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="KASIE FM"
-                android:textColor="@color/kasie_text_primary"
-                android:textSize="@dimen/text_title"
-                android:textStyle="bold" />
+        <service
+            android:name=".RadioService"
+            android:enabled="true"
+            android:exported="false" />
 
-        </LinearLayout>
+    </application>
 
-    </androidx.appcompat.widget.Toolbar>
-
-    <!-- Scrollable Content -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_standard">
-
-            <!-- Play Button Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="194dp"
-                android:layout_marginTop="@dimen/spacing_section"
-                android:layout_marginBottom="@dimen/spacing_section"
-                android:background="@color/kasie_accent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <!-- ON AIR / LIVE Badge -->
-                <TextView
-                    android:id="@+id/live_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="@color/kasie_badge_background"
-                    android:gravity="center"
-                    android:paddingLeft="12dp"
-                    android:paddingTop="4dp"
-                    android:paddingRight="12dp"
-                    android:paddingBottom="4dp"
-                    android:text="NOW ON AIR"
-                    android:textColor="@color/kasie_badge_text"
-                    android:textSize="@dimen/text_overline" />
-
-                <!-- Play/Pause Button (Standard Button, not FAB) -->
-                <Button
-                    android:id="@+id/playPauseButton"
-                    android:layout_width="56dp"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/kasie_play_button_background"
-                    android:contentDescription="@string/play_action"
-                    android:stateListAnimator="@null"
-                    android:text="▶"
-                    android:textColor="@color/kasie_text_primary"
-                    android:textSize="32sp" />
-
-                <!-- 97.1 FM Text -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="97.1 FM"
-                    android:textColor="@color/kasie_text_on_accent"
-                    android:textSize="@dimen/text_title" />
-
-            </LinearLayout>
-
-            <!-- Now Playing Section -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_standard"
-                android:background="@color/kasie_card_background"
-                android:padding="@dimen/spacing_standard"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="NOW PLAYING"
-                    android:textSize="@dimen/text_overline"
-                    android:textColor="@color/kasie_text_muted" />
-
-                <TextView
-                    android:id="@+id/title_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Kasie FM Live"
-                    android:textSize="@dimen/text_headline"
-                    android:textColor="@color/kasie_text_primary"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/artist_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Kasie FM"
-                    android:textSize="@dimen/text_body"
-                    android:textColor="@color/kasie_text_secondary" />
-
-            </LinearLayout>
-
-            <!-- Schedule Section (renamed header to avoid duplicating the "NOW ON AIR" badge above) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_section"
-                android:background="@color/kasie_card_background"
-                android:orientation="vertical"
-                android:padding="@dimen/spacing_standard">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="CURRENT SHOW"
-                    android:textColor="@color/kasie_text_muted"
-                    android:textSize="@dimen/text_overline" />
-
-                <TextView
-                    android:id="@+id/show_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="#HomeDrive"
-                    android:textColor="@color/kasie_text_primary"
-                    android:textSize="@dimen/text_title"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/show_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="15:00 - 18:00"
-                    android:textColor="@color/kasie_text_secondary"
-                    android:textSize="@dimen/text_body" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/kasie_card_background"
-        app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
-
-</LinearLayout>
+</manifest>

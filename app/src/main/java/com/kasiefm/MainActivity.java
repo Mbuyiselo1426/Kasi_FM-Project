@@ -1,206 +1,5 @@
-//package com.kasiefm;
-//
-//import android.annotation.SuppressLint;
-//import android.os.Bundle;
-//import android.widget.Button;
-//import android.widget.TextView;
-//import androidx.appcompat.app.AppCompatActivity;
-//import androidx.appcompat.widget.Toolbar;
-//import androidx.core.content.ContextCompat;
-//import com.google.android.exoplayer2.ExoPlayer;
-//import com.google.android.exoplayer2.MediaItem;
-//import com.google.android.exoplayer2.PlaybackException;
-//import com.google.android.exoplayer2.Player;
-//
-//public class MainActivity extends AppCompatActivity {
-//
-//    private ExoPlayer player;
-//    private boolean isPlaying = false;
-//    private Button playPauseButton;  // Changed from FAB to Button
-//    private TextView titleText;
-//    private TextView artistText;
-//    private TextView showTitle;
-//    private TextView showTime;
-//    private TextView navHome, navFeatured, navHighlights, navNews;
-//    private TextView liveBadge;
-//
-//    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
-//
-//    @SuppressLint("MissingInflatedId")
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        // Setup Toolbar
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayShowTitleEnabled(false);
-//        }
-//
-//        // Initialize views
-//        playPauseButton = findViewById(R.id.playPauseButton);
-//        titleText = findViewById(R.id.title_text);
-//        artistText = findViewById(R.id.artist_text);
-//        showTitle = findViewById(R.id.show_title);
-//        showTime = findViewById(R.id.show_time);
-//        liveBadge = findViewById(R.id.live_badge);
-//
-//        // Navigation TextViews
-//        navHome = findViewById(R.id.nav_home);
-//        navFeatured = findViewById(R.id.nav_featured);
-//        navHighlights = findViewById(R.id.nav_highlights);
-//        navNews = findViewById(R.id.nav_news);
-//
-//        // Set initial schedule
-//        showTitle.setText("#HomeDrive");
-//        showTime.setText("15:00 - 18:00");
-//
-//        initializePlayer();
-//
-//        // Play button click listener
-//        playPauseButton.setOnClickListener(v -> {
-//            if (isPlaying) {
-//                pauseRadio();
-//            } else {
-//                playRadio();
-//            }
-//        });
-//
-//        // Navigation clicks
-//        navHome.setOnClickListener(v -> {
-//            titleText.setText("Kasie FM Live");
-//            artistText.setText("Kasie FM");
-//            showTitle.setText("#HomeDrive");
-//            showTime.setText("15:00 - 18:00");
-//            updateNavigationColors(R.id.nav_home);
-//        });
-//
-//        navFeatured.setOnClickListener(v -> {
-//            titleText.setText("Featured Segment");
-//            artistText.setText("Best of Kasie FM");
-//            showTitle.setText("#Throwback");
-//            showTime.setText("18:00 - 20:00");
-//            updateNavigationColors(R.id.nav_featured);
-//        });
-//
-//        navHighlights.setOnClickListener(v -> {
-//            titleText.setText("Today's Highlights");
-//            artistText.setText("Top Moments");
-//            showTitle.setText("#Highlights");
-//            showTime.setText("20:00 - 22:00");
-//            updateNavigationColors(R.id.nav_highlights);
-//        });
-//
-//        navNews.setOnClickListener(v -> {
-//            titleText.setText("Kasie FM News");
-//            artistText.setText("Community Updates");
-//            showTitle.setText("#NewsHour");
-//            showTime.setText("22:00 - 00:00");
-//            updateNavigationColors(R.id.nav_news);
-//        });
-//    }
-//
-//    private void initializePlayer() {
-//        player = new ExoPlayer.Builder(this).build();
-//        MediaItem mediaItem = MediaItem.fromUri(RADIO_STREAM_URL);
-//        player.setMediaItem(mediaItem);
-//
-//        player.addListener(new Player.Listener() {
-//            @Override
-//            public void onPlaybackStateChanged(int playbackState) {
-//                runOnUiThread(() -> {
-//                    if (playbackState == Player.STATE_BUFFERING) {
-//                        playPauseButton.setEnabled(false);
-//                        if (liveBadge != null) {
-//                            liveBadge.setText("BUFFERING");
-//                        }
-//                    } else if (playbackState == Player.STATE_READY) {
-//                        playPauseButton.setEnabled(true);
-//                        if (liveBadge != null) {
-//                            liveBadge.setText("LIVE");
-//                        }
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onPlayerError(PlaybackException error) {
-//                runOnUiThread(() -> {
-//                    playPauseButton.setEnabled(true);
-//                    isPlaying = false;
-//                    playPauseButton.setText("▶");
-//                    if (liveBadge != null) {
-//                        liveBadge.setText("OFFLINE");
-//                    }
-//                    titleText.setText("Connection Error");
-//                    artistText.setText("Tap to retry");
-//                });
-//            }
-//        });
-//
-//        player.prepare();
-//    }
-//
-//    private void playRadio() {
-//        if (player != null) {
-//            player.setPlayWhenReady(true);
-//            isPlaying = true;
-//            playPauseButton.setText("⏸");
-//
-//            titleText.setText("Kasie FM Live");
-//            artistText.setText("Kasie FM");
-//
-//            if (liveBadge != null) {
-//                liveBadge.setText("LIVE");
-//            }
-//        }
-//    }
-//
-//    private void pauseRadio() {
-//        if (player != null) {
-//            player.setPlayWhenReady(false);
-//            isPlaying = false;
-//            playPauseButton.setText("▶");
-//
-//            titleText.setText("Paused");
-//            artistText.setText("Tap play to resume");
-//        }
-//    }
-//
-//    private void updateNavigationColors(int activeNavId) {
-//        // Reset all navigation colors to gray
-//        navHome.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-//        navFeatured.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-//        navHighlights.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-//        navNews.setTextColor(ContextCompat.getColor(this, android.R.color.darker_gray));
-//
-//        // Set active navigation color to white
-//        int activeColor = ContextCompat.getColor(this, android.R.color.white);
-//
-//        if (activeNavId == R.id.nav_home) {
-//            navHome.setTextColor(activeColor);
-//        } else if (activeNavId == R.id.nav_featured) {
-//            navFeatured.setTextColor(activeColor);
-//        } else if (activeNavId == R.id.nav_highlights) {
-//            navHighlights.setTextColor(activeColor);
-//        } else if (activeNavId == R.id.nav_news) {
-//            navNews.setTextColor(activeColor);
-//        }
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        if (player != null) {
-//            player.release();
-//            player = null;
-//        }
-//    }
-//}
 package com.kasiefm;
-
+//hello
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
@@ -213,172 +12,195 @@ import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.kasiefm.api.KasieApiService;
+import com.kasiefm.api.RetrofitClient;
+import com.kasiefm.api.Show;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
 
-    private ExoPlayer player;
-    private boolean isPlaying = false;
-    private Button playPauseButton;  // Changed from FAB to Button
-    private TextView titleText;
-    private TextView artistText;
-    private TextView showTitle;
-    private TextView showTime;
-    private BottomNavigationView bottomNavigation;
-    private TextView liveBadge;
+private ExoPlayer player;
+private boolean isPlaying = false;
+private Button playPauseButton;
+private TextView titleText;
+ private TextView artistText;
+ private TextView showTitle;
+ private TextView showTime;
+ private BottomNavigationView bottomNavigation;private TextView liveBadge;
+ private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
 
-    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
+ @SuppressLint("MissingInflatedId")
+@Override
+ protected void onCreate(Bundle savedInstanceState) {
+     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
 
-    @SuppressLint("MissingInflatedId")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        // Setup Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    if (getSupportActionBar() != null) {
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
-        // Initialize views
-        playPauseButton = findViewById(R.id.playPauseButton);
-        titleText = findViewById(R.id.title_text);
-        artistText = findViewById(R.id.artist_text);
-        showTitle = findViewById(R.id.show_title);
-        showTime = findViewById(R.id.show_time);
-        liveBadge = findViewById(R.id.live_badge);
+    playPauseButton = findViewById(R.id.playPauseButton);
+    titleText = findViewById(R.id.title_text);
+    artistText = findViewById(R.id.artist_text);
+    showTitle = findViewById(R.id.show_title);
+    showTime = findViewById(R.id.show_time);
+    liveBadge = findViewById(R.id.live_badge);
 
-        // Bottom navigation (Material BottomNavigationView).
-        // nav_home / nav_featured / nav_highlights / nav_news are now menu item
-        // ids (see res/menu/bottom_nav_menu.xml) rather than separate view ids,
-        // so they're read through the BottomNavigationView's item-selected callback.
-        bottomNavigation = findViewById(R.id.bottom_navigation);
+    bottomNavigation = findViewById(R.id.bottom_navigation);
 
-        // Set initial schedule
-        showTitle.setText("#HomeDrive");
-        showTime.setText("15:00 - 18:00");
+    loadSchedule();
+    initializePlayer();
 
-        initializePlayer();
+    playPauseButton.setOnClickListener(v -> {
+if (isPlaying) {
+pauseRadio();
+} else {
+playRadio();
+}
+});
 
-        // Play button click listener
-        playPauseButton.setOnClickListener(v -> {
-            if (isPlaying) {
-                pauseRadio();
-            } else {
-                playRadio();
-            }
-        });
+    bottomNavigation.setOnItemSelectedListener(item -> {
+    int itemId = item.getItemId();
 
-        // Navigation clicks
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
+    if (itemId == R.id.nav_home) {
+    titleText.setText("Kasie FM Live");
+    artistText.setText("Kasie FM");
+    loadSchedule();
+    return true;
+    } else if (itemId == R.id.nav_featured) {
+    titleText.setText("Featured Segment");
+    artistText.setText("Best of Kasie FM");
+    showTitle.setText("#Throwback");
+    showTime.setText("18:00 - 20:00");
+    return true;
+    } else if (itemId == R.id.nav_highlights) {
+    titleText.setText("Today's Highlights");
+    artistText.setText("Top Moments");
+    showTitle.setText("#Highlights");
+    showTime.setText("20:00 - 22:00");
+return true;
+} else if (itemId == R.id.nav_news) {
+titleText.setText("Kasie FM News");
+artistText.setText("Community Updates");
+showTitle.setText("#NewsHour");
+showTime.setText("22:00 - 00:00");
+return true;
+}
 
-            if (itemId == R.id.nav_home) {
-                titleText.setText("Kasie FM Live");
-                artistText.setText("Kasie FM");
-                showTitle.setText("#HomeDrive");
-                showTime.setText("15:00 - 18:00");
-                return true;
-            } else if (itemId == R.id.nav_featured) {
-                titleText.setText("Featured Segment");
-                artistText.setText("Best of Kasie FM");
-                showTitle.setText("#Throwback");
-                showTime.setText("18:00 - 20:00");
-                return true;
-            } else if (itemId == R.id.nav_highlights) {
-                titleText.setText("Today's Highlights");
-                artistText.setText("Top Moments");
-                showTitle.setText("#Highlights");
-                showTime.setText("20:00 - 22:00");
-                return true;
-            } else if (itemId == R.id.nav_news) {
-                titleText.setText("Kasie FM News");
-                artistText.setText("Community Updates");
-                showTitle.setText("#NewsHour");
-                showTime.setText("22:00 - 00:00");
-                return true;
-            }
+return false;
+});
+}
 
-            return false;
-        });
-    }
+private void loadSchedule() {
+showTitle.setText("Loading schedule...");
+showTime.setText("");
 
-    private void initializePlayer() {
-        player = new ExoPlayer.Builder(this).build();
-        MediaItem mediaItem = MediaItem.fromUri(RADIO_STREAM_URL);
-        player.setMediaItem(mediaItem);
+KasieApiService api = RetrofitClient.getInstance().create(KasieApiService.class);
 
-        player.addListener(new Player.Listener() {
-            @Override
-            public void onPlaybackStateChanged(int playbackState) {
-                runOnUiThread(() -> {
-                    if (playbackState == Player.STATE_BUFFERING) {
-                        playPauseButton.setEnabled(false);
-                        if (liveBadge != null) {
-                            liveBadge.setText("BUFFERING");
-                        }
-                    } else if (playbackState == Player.STATE_READY) {
-                        playPauseButton.setEnabled(true);
-                        if (liveBadge != null) {
-                            liveBadge.setText("LIVE");
-                        }
-                    }
-                });
-            }
+api.getSchedule().enqueue(new Callback<List<Show>>() {
+@Override
+public void onResponse(Call<List<Show>> call, Response<List<Show>> response) {
+if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+Show current = response.body().get(0);
+showTitle.setText(current.getName());
+showTime.setText(current.getStartTime() + " - " + current.getEndTime());
+} else {
+showTitle.setText("Schedule unavailable");
+showTime.setText("");
+}
+}
 
-            @Override
-            public void onPlayerError(PlaybackException error) {
-                runOnUiThread(() -> {
-                    playPauseButton.setEnabled(true);
-                    isPlaying = false;
-                    playPauseButton.setText("▶");
-                    playPauseButton.setContentDescription(getString(R.string.play_action));
-                    if (liveBadge != null) {
-                        liveBadge.setText("OFFLINE");
-                    }
-                    titleText.setText("Connection Error");
-                    artistText.setText("Tap to retry");
-                });
-            }
-        });
+@Override
+public void onFailure(Call<List<Show>> call, Throwable t) {
+showTitle.setText("Unable to load schedule");
+showTime.setText("Check your connection");
+}
+});
+}
 
-        player.prepare();
-    }
+private void initializePlayer() {
+player = new ExoPlayer.Builder(this).build();
+MediaItem mediaItem = MediaItem.fromUri(RADIO_STREAM_URL);
+player.setMediaItem(mediaItem);
 
-    private void playRadio() {
-        if (player != null) {
-            player.setPlayWhenReady(true);
-            isPlaying = true;
-            playPauseButton.setText("⏸");
-            playPauseButton.setContentDescription(getString(R.string.pause_action));
+player.addListener(new Player.Listener() {
+@Override
+public void onPlaybackStateChanged(int playbackState) {
+runOnUiThread(() -> {
+if (playbackState == Player.STATE_BUFFERING) {
+playPauseButton.setEnabled(false);
+if (liveBadge != null) {
+liveBadge.setText("BUFFERING");
+}
+} else if (playbackState == Player.STATE_READY) {
+playPauseButton.setEnabled(true);
+if (liveBadge != null) {
+liveBadge.setText("LIVE");
+}
+}
+});
+}
 
-            titleText.setText("Kasie FM Live");
-            artistText.setText("Kasie FM");
+@Override
+public void onPlayerError(PlaybackException error) {
+runOnUiThread(() -> {
+playPauseButton.setEnabled(true);
+isPlaying = false;
+playPauseButton.setText(" ");
+playPauseButton.setContentDescription(getString(R.string.play_action));
+if (liveBadge != null) {
+liveBadge.setText("OFFLINE");
+}
+titleText.setText("Connection Error");
+ artistText.setText("Tap to retry");
+});
+}
+});
 
-            if (liveBadge != null) {
-                liveBadge.setText("LIVE");
-            }
-        }
-    }
+player.prepare();
+}
 
-    private void pauseRadio() {
-        if (player != null) {
-            player.setPlayWhenReady(false);
-            isPlaying = false;
-            playPauseButton.setText("▶");
-            playPauseButton.setContentDescription(getString(R.string.play_action));
+private void playRadio() {
+if (player != null) {
+player.setPlayWhenReady(true);
+isPlaying = true;
+playPauseButton.setText(" ");
+playPauseButton.setContentDescription(getString(R.string.pause_action));
 
-            titleText.setText("Paused");
-            artistText.setText("Tap play to resume");
-        }
-    }
+titleText.setText("Kasie FM Live");
+artistText.setText("Kasie FM");
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-    }
+if (liveBadge != null) {
+liveBadge.setText("LIVE");
+}
+}
+}
+
+private void pauseRadio() {
+if (player != null) {
+player.setPlayWhenReady(false);
+isPlaying = false;
+playPauseButton.setText(" ");
+playPauseButton.setContentDescription(getString(R.string.play_action));
+
+titleText.setText("Paused");
+artistText.setText("Tap play to resume");
+}
+}
+
+@Override
+protected void onDestroy() {
+super.onDestroy();
+if (player != null) {
+player.release();
+player = null;
+}
+}
 }
