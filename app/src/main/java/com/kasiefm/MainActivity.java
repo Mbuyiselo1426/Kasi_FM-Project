@@ -46,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
             radioService = binder.getService();
             serviceBound = true;
 
+            // TEMP DEBUG: confirm this actually fires on rebind, and what state it sees.
+            // Watch Logcat for tag "KasieDebug" after pressing Home and reopening the app.
+            android.util.Log.d("KasieDebug", "onServiceConnected fired, current state = "
+                    + radioService.getCurrentState());
+
             // Sync immediately: if we're rebinding to a service that's already
             // LIVE (or already PAUSED), there's no new state transition coming to
             // trigger the listener below, so we'd otherwise be stuck showing
