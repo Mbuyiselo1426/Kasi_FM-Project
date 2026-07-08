@@ -6,24 +6,51 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-// ExoPlayer 2.x imports (replaces androidx.media3)
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 
+/**
+ * Owns the ExoPlayer instance and is the single source of truth for playback
+ * state. MainActivity binds to this Service and asks it to play/pause instead
+ * of holding its own player. Because it's also started as a foreground
+ * service (see MainActivity#onStart), it keeps running - and keeps the audio
+ * playing - even if the Activity is destroyed or the app is backgrounded.
+ *
+ * TODO(station): RADIO_STREAM_URL is still the SomaFM placeholder. Once the
+ * backend's /api/stream-url is wired in here (Retrofit call before
+ * player.prepare()), this constant goes away entirely. That's a separate,
+ * later change - it doesn't block this fix.
+ */
 public class RadioService extends Service {
+
+    /** Callback so the UI can reflect playback state without touching the player. */
+    public interface PlaybackStateListener {
+        void onStateChanged(String state); // "LIVE" | "BUFFERING" | "PAUSED"
+        void onError();
+    }
+
+    private final IBinder binder = new LocalBinder();
+    private PlaybackStateListener listener;
 
     private ExoPlayer player;
     private static final String CHANNEL_ID = "RadioServiceChannel";
     private static final int NOTIFICATION_ID = 1;
     private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
+
+    public class LocalBinder extends Binder {
+        RadioService getService() {
+            return RadioService.this;
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -32,25 +59,24 @@ public class RadioService extends Service {
         initializePlayer();
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-
-        if (action != null) {
-            switch (action) {
-                case "PLAY":
-                    startRadio();
-                    break;
-                case "PAUSE":
-                    pauseRadio();
-                    break;
-                case "STOP":
-                    stopRadio();
-                    break;
-            }
-        }
-
+        // Started (not just bound) so the service survives after the Activity unbinds.
         return START_STICKY;
+    }
+
+    public void setPlaybackStateListener(PlaybackStateListener listener) {
+        this.listener = listener;
+    }
+
+    public boolean isPlaying() {
+        return player != null && player.getPlayWhenReady();
     }
 
     private void initializePlayer() {
@@ -64,41 +90,44 @@ public class RadioService extends Service {
             @SuppressLint("ForegroundServiceType")
             @Override
             public void onPlaybackStateChanged(int playbackState) {
-                if (playbackState == Player.STATE_READY) {
+                if (playbackState == Player.STATE_BUFFERING) {
+                    notifyState("BUFFERING");
+                } else if (playbackState == Player.STATE_READY && player.getPlayWhenReady()) {
                     startForeground(NOTIFICATION_ID, createNotification("Kasie FM - Playing"));
+                    notifyState("LIVE");
                 }
             }
 
             @Override
             public void onPlayerError(@NonNull PlaybackException error) {
                 stopForeground(true);
-                stopSelf();
+                if (listener != null) {
+                    listener.onError();
+                }
             }
         });
     }
 
     @SuppressLint("ForegroundServiceType")
-    private void startRadio() {
+    public void play() {
         if (player != null) {
             player.setPlayWhenReady(true);
             startForeground(NOTIFICATION_ID, createNotification("Kasie FM - Playing"));
         }
     }
 
-    private void pauseRadio() {
+    public void pause() {
         if (player != null) {
             player.setPlayWhenReady(false);
             stopForeground(false);
+            notifyState("PAUSED");
         }
     }
 
-    private void stopRadio() {
-        if (player != null) {
-            player.release();
-            player = null;
+    private void notifyState(String state) {
+        if (listener != null) {
+            listener.onStateChanged(state);
         }
-        stopForeground(true);
-        stopSelf();
     }
 
     private Notification createNotification(String content) {
@@ -129,11 +158,5 @@ public class RadioService extends Service {
             player.release();
             player = null;
         }
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }
