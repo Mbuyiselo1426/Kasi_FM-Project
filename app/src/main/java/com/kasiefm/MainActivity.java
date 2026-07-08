@@ -46,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
             radioService = binder.getService();
             serviceBound = true;
 
+            // Sync immediately: if we're rebinding to a service that's already
+            // LIVE (or already PAUSED), there's no new state transition coming to
+            // trigger the listener below, so we'd otherwise be stuck showing
+            // whatever the UI happened to say before this Activity was recreated.
+            updateUiForState(radioService.getCurrentState());
+
             radioService.setPlaybackStateListener(new RadioService.PlaybackStateListener() {
                 @Override
                 public void onStateChanged(String state) {
