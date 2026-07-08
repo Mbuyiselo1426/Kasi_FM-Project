@@ -1,5 +1,4 @@
 package com.kasiefm;
-//bye
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
