@@ -1,89 +1,79 @@
+# Kasie FM — Android App
 
-# KasiStream - Learning Context
+Android client for the Kasie FM cloud-native radio project. Talks to the
+[Kasie FM API](https://github.com/Mbuyiselo1426/Kasifm-api) over HTTPS/JSON —
+no shared code between the two repos, only a shared API contract.
 
-## About This Project
+> **Status note:** this is a student prototype inspired by the real Kasie FM
+> 97.1 community station (Katlehong / Thokoza, Ekurhuleni). The real station
+> has **not yet given permission** for its branding, live stream, or full
+> schedule to be used. The logo currently in this repo is theirs and used
+> only for a private demo; nothing here is public or affiliated with the
+> station until they say otherwise. See the project journey log for details.
 
-This codebase was created as a **learning exercise** using AI assistance (GitHub Copilot / AI prompts). I did not write every line from memory—instead, I:
+## What it does
 
-1. Used AI prompts to generate boilerplate code
-2. Reviewed and understood each component
-3. Modified and adapted the code to fit my learning goals
-4. Used this as hands-on practice for Android development with Java
+- Streams a live radio feed via ExoPlayer, played and owned by a foreground
+  `Service` (`RadioService`) — not the Activity — so playback survives the
+  app being backgrounded.
+- Pulls the current show schedule live from the backend API
+  (`GET /api/schedule`) instead of hardcoded strings.
+- Shows loading/error states while the network call is in flight.
 
-## What I Learned
+## Architecture — why a Service owns the player
 
-- How ExoPlayer works for audio streaming
-- Android Service lifecycle for background playback
-- Managing notifications for foreground services
-- UI event handling in Android
+Early versions had both `MainActivity` and `RadioService` independently
+creating their own `ExoPlayer`, which meant the foreground service existed in
+code but wasn't actually reachable from the UI, and playback died the moment
+the Activity did. The current design:
 
-## Why This Approach
+- `RadioService` is the **only** owner of the `ExoPlayer` instance, exposes
+  `play()` / `pause()` / `isPlaying()` / `getCurrentState()` through a
+  `Binder`, and reports state changes back via a `PlaybackStateListener`
+  callback.
+- `MainActivity` **starts** the service (`startForegroundService`, so it
+  survives independently of the Activity) and **binds** to it
+  (`bindService`, so it can call methods and receive callbacks) in
+  `onStart()`, then unbinds — without stopping the service — in `onStop()`.
+- On rebind (e.g. returning from Home), the Activity immediately calls
+  `getCurrentState()` to sync the UI, rather than waiting passively for the
+  next state-change callback, which may never come if nothing changes while
+  the app was backgrounded.
 
-As a student developer, AI tools help me:
-- Learn by seeing working examples
-- Understand project structure faster
-- Focus on learning concepts rather than syntax errors
+## Setup
 
-## My Actual Contributions
+Requires the [Kasie FM API](https://github.com/Mbuyiselo1426/Kasifm-api)
+running somewhere reachable — either locally via Docker or the live Render
+deployment. Point `RetrofitClient`'s base URL at whichever you're using.
 
-- Understanding the code I'm committing
-- Adapting it to the Kasie FM use case
-- Setting up the Android project structure
-- Planning future features (data-saving mode, push notifications)
+Build and run like any Android project (Android Studio, or via the GitHub
+Actions CI pipeline below if your machine can't comfortably run the
+emulator).
 
-## Future Plans
+### Building without a local emulator
 
-- Replace placeholder stream URL with actual Kasie FM stream
-- Add "Data Lite" mode for low-data usage
-- Implement song request feature via WhatsApp
-- Add push notifications for show reminders
+If your machine is resource-constrained, this repo's GitHub Actions workflow
+compiles a debug APK on every push. Download the artifact from the Actions
+tab and side-load it onto a physical device (`Install unknown apps` from
+whichever app you download it through) — no local Android Studio build
+required.
 
+## Known issues
 
+- `/api/stream-url` is not yet wired into `RadioService` — it still points
+  at a SomaFM placeholder stream. This is intentional until the real Kasie
+  FM stream URL is confirmed with the station.
+- Featured / Highlights / News bottom-nav tabs currently show static
+  placeholder text, not live API data — only the Home tab is wired to the
+  backend so far.
+- ExoPlayer is on 2.18.7; migration to `androidx.media3` is planned but not
+  started.
 
--Added the UI design 
+## Roadmap
 
-┌─────────────────────────────────┐
-│         KASIE FM                │  ← Top Toolbar
-├─────────────────────────────────┤
-│                                 │
-│      [ LISTEN NOW ]             │  ← Big play button
-│                                 │
-│  ┌─────────────────────────┐    │
-│  │ NOW PLAYING             │    │
-│  │ Kasie FM Live           │    │
-│  │ Kasie FM                │    │
-│  └─────────────────────────┘    │
-│                                 │
-│  ┌─────────────────────────┐    │
-│  │ NOW ON AIR              │    │
-│  │ #HomeDrive              │    │
-│  │ 15:00 - 18:00           │    │
-│  └─────────────────────────┘    │
-│                                 │
-├─────────────────────────────────┤
-│ [KASIE FM] [FEATURED] [HIGHLIGHTS] [NEWS] │ ← Bottom Nav
-
-└─────────────────────────────────┘
-
-# Delete corrupted cache
-rm -rf ~/.gradle/caches/9.4.1
-rm -rf ~/.gradle/caches/transforms-*
-
-# Then rebuild
-./gradlew clean build --refresh-dependencies
-
-# Check what files you changed
-git status
-
-# Add all Server Core files
-git add za/co/wethinkcode/robots/server/*.java
-
-# Commit with message
-git commit -m "feat(server-core): implement complete world foundation for Iteration 1
-
-- Add Position, Direction, Obstacle, Robot, World classes
-- Implement dump() and robotsCommand()
-- Add thread safety and collision detection"
-
-# Push to remote branch
-git push origin your-branch-name
+- Wire `/api/stream-url` into `RadioService` (pending Kasie FM's real stream
+  URL and permission).
+- Migrate to `androidx.media3`.
+- Data Lite mode for low-data usage.
+- Push notifications for show reminders.
+- Point the app at the eventual AWS-hosted backend instead of Render.
