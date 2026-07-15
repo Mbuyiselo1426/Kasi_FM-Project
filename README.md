@@ -77,3 +77,16 @@ required.
 - Data Lite mode for low-data usage.
 - Push notifications for show reminders.
 - Point the app at the eventual AWS-hosted backend instead of Render.
+
+## a new update i must change at navbar
+Better navigation
+
+Home
+
+Featured
+
+Highlights
+
+Requests
+
+News
