@@ -1,5 +1,5 @@
 plugins {
-    id("com.android.application")  id("com.android.application") version "7.4.2" apply false
+    id("com.android.application")
 }
 
 android {
@@ -32,11 +32,13 @@ android {
 configurations.all {
     exclude(group = "androidx.media", module = "media")
 }
+
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.android.exoplayer:exoplayer:2.18.7")
-    implementation("com.google.android.material:material:1.9.0")  // ← add this
+    implementation("com.google.android.material:material:1.9.0")
+    implementation("androidx.fragment:fragment:1.6.2")
 
     // Retrofit + Gson for talking to the Kasie FM API
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
@@ -44,5 +46,4 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     testImplementation("junit:junit:4.13.2")
-
 }
