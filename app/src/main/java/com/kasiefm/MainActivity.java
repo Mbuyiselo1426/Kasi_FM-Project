@@ -11,27 +11,27 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import com.kasiefm.api.KasieApiService;
-import com.kasiefm.api.RetrofitClient;
-import com.kasiefm.api.Show;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button playPauseButton;
     private TextView titleText;
     private TextView artistText;
-    private TextView showTitle;
-    private TextView showTime;
     private BottomNavigationView bottomNavigation;
     private TextView liveBadge;
+
+    // Cached so switching tabs doesn't re-fetch the schedule or rebuild the
+    // CONNECT form every time - each tab's Fragment instance is created once
+    // and just shown/hidden.
+    private Fragment homeFragment;
+    private Fragment featuredFragment;
+    private Fragment highlightsFragment;
+    private Fragment connectFragment;
+    private Fragment activeFragment;
 
     // MainActivity no longer owns an ExoPlayer or a stream URL constant - RadioService
     // owns both. This class only asks the Service to play/pause and reflects whatever
@@ -45,11 +45,6 @@ public class MainActivity extends AppCompatActivity {
             RadioService.LocalBinder binder = (RadioService.LocalBinder) service;
             radioService = binder.getService();
             serviceBound = true;
-
-            // TEMP DEBUG: confirm this actually fires on rebind, and what state it sees.
-            // Watch Logcat for tag "KasieDebug" after pressing Home and reopening the app.
-            android.util.Log.d("KasieDebug", "onServiceConnected fired, current state = "
-                    + radioService.getCurrentState());
 
             // Sync immediately: if we're rebinding to a service that's already
             // LIVE (or already PAUSED), there's no new state transition coming to
@@ -101,13 +96,9 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton = findViewById(R.id.playPauseButton);
         titleText = findViewById(R.id.title_text);
         artistText = findViewById(R.id.artist_text);
-        showTitle = findViewById(R.id.show_title);
-        showTime = findViewById(R.id.show_time);
         liveBadge = findViewById(R.id.live_badge);
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
-
-        loadSchedule();
 
         playPauseButton.setOnClickListener(v -> {
             if (!serviceBound || radioService == null) {
@@ -120,36 +111,80 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        if (savedInstanceState == null) {
+            // Fresh start: fragment_container in activity_main.xml already declares
+            // HomeFragment via android:name, so the FragmentManager has already
+            // created and shown it - just record it as the active one instead of
+            // adding a second copy.
+            homeFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            activeFragment = homeFragment;
+        } else {
+            // Fragment restored by the system after a config change - reattach by tag.
+            homeFragment = getSupportFragmentManager().findFragmentByTag("home");
+            featuredFragment = getSupportFragmentManager().findFragmentByTag("featured");
+            highlightsFragment = getSupportFragmentManager().findFragmentByTag("highlights");
+            connectFragment = getSupportFragmentManager().findFragmentByTag("connect");
+        }
+
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home) {
-                titleText.setText("Kasie FM Live");
-                artistText.setText("Kasie FM");
-                loadSchedule();
+                if (homeFragment == null) {
+                    homeFragment = new HomeFragment();
+                }
+                showFragment(homeFragment, "home");
                 return true;
             } else if (itemId == R.id.nav_featured) {
-                titleText.setText("Featured Segment");
-                artistText.setText("Best of Kasie FM");
-                showTitle.setText("#Throwback");
-                showTime.setText("18:00 - 20:00");
+                if (featuredFragment == null) {
+                    featuredFragment = SimpleContentFragment.newInstance(
+                            "FEATURED SEGMENT", "Best of Kasie FM", "Highlights from past shows");
+                }
+                showFragment(featuredFragment, "featured");
                 return true;
             } else if (itemId == R.id.nav_highlights) {
-                titleText.setText("Today's Highlights");
-                artistText.setText("Top Moments");
-                showTitle.setText("#Highlights");
-                showTime.setText("20:00 - 22:00");
+                if (highlightsFragment == null) {
+                    highlightsFragment = SimpleContentFragment.newInstance(
+                            "TODAY'S HIGHLIGHTS", "Top Moments", "The best bits from today");
+                }
+                showFragment(highlightsFragment, "highlights");
                 return true;
-            } else if (itemId == R.id.nav_news) {
-                titleText.setText("Kasie FM News");
-                artistText.setText("Community Updates");
-                showTitle.setText("#NewsHour");
-                showTime.setText("22:00 - 00:00");
+            } else if (itemId == R.id.nav_connect) {
+                if (connectFragment == null) {
+                    connectFragment = new ConnectFragment();
+                }
+                showFragment(connectFragment, "connect");
                 return true;
             }
 
             return false;
         });
+    }
+
+    /**
+     * Swaps the visible tab content Fragment without touching titleText/
+     * artistText/liveBadge - those stay Activity-level and are driven only
+     * by RadioService's playback state, never by which tab is selected.
+     * This is the fix for the old bug where tab-switching and playback
+     * state used to fight over the same TextViews.
+     */
+    private void showFragment(Fragment fragment, String tag) {
+        if (activeFragment == fragment) {
+            return;
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        if (!fragment.isAdded()) {
+            transaction.add(R.id.fragment_container, fragment, tag);
+        }
+        for (Fragment existing : new Fragment[]{homeFragment, featuredFragment, highlightsFragment, connectFragment}) {
+            if (existing != null && existing != fragment && existing.isAdded()) {
+                transaction.hide(existing);
+            }
+        }
+        transaction.show(fragment);
+        transaction.commit();
+        activeFragment = fragment;
     }
 
     @Override
@@ -196,32 +231,5 @@ public class MainActivity extends AppCompatActivity {
                 artistText.setText("Tap play to resume");
                 break;
         }
-    }
-
-    private void loadSchedule() {
-        showTitle.setText("Loading schedule...");
-        showTime.setText("");
-
-        KasieApiService api = RetrofitClient.getInstance().create(KasieApiService.class);
-
-        api.getSchedule().enqueue(new Callback<List<Show>>() {
-            @Override
-            public void onResponse(Call<List<Show>> call, Response<List<Show>> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    Show current = response.body().get(0);
-                    showTitle.setText(current.getName());
-                    showTime.setText(current.getStartTime() + " - " + current.getEndTime());
-                } else {
-                    showTitle.setText("Schedule unavailable");
-                    showTime.setText("");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Show>> call, Throwable t) {
-                showTitle.setText("Unable to load schedule");
-                showTime.setText("Check your connection");
-            }
-        });
     }
 }
