@@ -1,20 +1,50 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "com.kasiefm"
+    compileSdk = 33
+
+    defaultConfig {
+        applicationId = "com.kasiefm"
+        minSdk = 21
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0"
     }
-    dependencies {
-        classpath("com.android.tools.build:gradle:7.4.2")
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+// Exclude transitive androidx.media pulls from ExoPlayer to avoid
+// resource conflicts with the bundled media2/media3 copies.
+configurations.all {
+    exclude(group = "androidx.media", module = "media")
 }
+dependencies {
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.exoplayer:exoplayer:2.18.7")
+    implementation("com.google.android.material:material:1.9.0")  // ← add this
+    implementation("androidx.fragment:fragment:1.6.2")
 
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    // Retrofit + Gson for talking to the Kasie FM API
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    testImplementation("junit:junit:4.13.2")
+
+}e(rootProject.buildDir)
 }
