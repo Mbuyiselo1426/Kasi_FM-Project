@@ -46,7 +46,7 @@ public class RadioService extends Service {
     private ExoPlayer player;
     private static final String CHANNEL_ID = "RadioServiceChannel";
     private static final int NOTIFICATION_ID = 1;
-    private static final String RADIO_STREAM_URL = "https://ice1.somafm.com/groovesalad-128-mp3";
+    private static final String RADIO_STREAM_URL = "https://s44.myradiostream.com/9128/listen.mp3";
 
     public class LocalBinder extends Binder {
         RadioService getService() {
