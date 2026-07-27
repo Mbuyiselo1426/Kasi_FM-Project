@@ -2,7 +2,7 @@ name: Build debug APK
 
 on:
   push:
-    branches: [ main feat/home-ui ]
+    branches: [ main ]
   workflow_dispatch: {}
 
 jobs:
