@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                         if (liveBadge != null) {
                             liveBadge.setText("OFFLINE");
                         }
-                        titleText.setText("Connection Error");
+                        titleText.setText(getString(R.string.network_error_message));
                         artistText.setText("Tap to retry");
                     });
                 }

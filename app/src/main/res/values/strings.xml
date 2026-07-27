@@ -4,4 +4,5 @@
     <string name="kasie_fm_logo">Kasie FM Logo</string>
     <string name="play_action">Play</string>
     <string name="pause_action">Pause</string>
+    <string name="network_error_message">Unable to connect to Kasi FM. Please check your internet connection.</string>
 </resources>
