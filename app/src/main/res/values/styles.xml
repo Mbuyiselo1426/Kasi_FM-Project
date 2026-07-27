@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Type ramp. Uses platform font families so it compiles without bundled
+         TTFs. To match the mockup exactly, drop Archivo/Inter/Space Mono into
+         res/font and swap the android:fontFamily values. -->
+    <style name="TextAppearance.Kasie.Display" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_display</item>
+        <item name="android:textColor">@color/kasie_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Kasie.Section" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">@dimen/text_section</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textColor">@color/kasie_text_primary</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Kasie.CardTitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">@dimen/text_card_title</item>
+        <item name="android:textColor">@color/kasie_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Kasie.RowTitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_row_title</item>
+        <item name="android:textColor">@color/kasie_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Kasie.Meta" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/text_meta</item>
+        <item name="android:textColor">@color/kasie_text_muted</item>
+    </style>
+
+    <style name="TextAppearance.Kasie.Mono" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">@dimen/text_mono</item>
+        <item name="android:textColor">@color/kasie_text_muted</item>
+    </style>
+</resources>

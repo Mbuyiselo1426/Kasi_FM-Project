@@ -2,34 +2,156 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#1A1A2E"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
 
+    <!-- ===== ON AIR TODAY ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ON AIR TODAY"
+            android:textAppearance="@style/TextAppearance.Kasie.Section" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Full schedule ›"
+            android:textColor="@color/kasie_cyan"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dark_card"
+        android:orientation="vertical">
+
+        <!-- past -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:orientation="horizontal" android:padding="15dp" android:alpha="0.55">
+            <TextView android:layout_width="42dp" android:layout_height="wrap_content" android:gravity="end"
+                android:text="03:00" android:fontFamily="monospace" android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
+            <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="12dp" android:background="@drawable/dot_idle" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Vuka Kasie-Rise and Shine" android:textAppearance="@style/TextAppearance.Kasie.RowTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wake-up show" android:textAppearance="@style/TextAppearance.Kasie.Meta" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="06:00" android:fontFamily="monospace" android:textColor="@color/kasie_text_muted" android:textSize="11sp" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/kasie_outline" />
+
+        <!-- ON AIR (bound to schedule API via show_title / show_time) -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:orientation="horizontal" android:padding="15dp" android:background="@drawable/bg_schedule_now">
+            <TextView android:layout_width="42dp" android:layout_height="wrap_content" android:gravity="end"
+                android:text="06:00" android:fontFamily="monospace" android:textColor="@color/kasie_accent" android:textSize="12sp" />
+            <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="12dp" android:background="@drawable/dot_now" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                <TextView android:id="@+id/show_title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Asiye 6-9 Breakfast Show" android:textAppearance="@style/TextAppearance.Kasie.RowTitle" />
+                <TextView android:id="@+id/show_time" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="06:00 - 09:00" android:textAppearance="@style/TextAppearance.Kasie.Meta" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:background="@drawable/bg_onair_pill" android:paddingStart="7dp" android:paddingEnd="7dp"
+                android:paddingTop="3dp" android:paddingBottom="3dp" android:text="ON AIR"
+                android:fontFamily="sans-serif-black" android:textColor="@color/kasie_text_on_accent" android:textSize="10sp" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/kasie_outline" />
+
+        <!-- upcoming -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_vertical" android:orientation="horizontal" android:padding="15dp">
+            <TextView android:layout_width="42dp" android:layout_height="wrap_content" android:gravity="end"
+                android:text="09:00" android:fontFamily="monospace" android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
+            <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="12dp" android:background="@drawable/dot_idle" />
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Morning Essentials" android:textAppearance="@style/TextAppearance.Kasie.RowTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Lifestyle &amp; community" android:textAppearance="@style/TextAppearance.Kasie.Meta" />
+            </LinearLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:00" android:fontFamily="monospace" android:textColor="@color/kasie_text_muted" android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ===== PODCASTS ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="PODCASTS" android:textAppearance="@style/TextAppearance.Kasie.Section" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View all ›" android:textColor="@color/kasie_cyan" android:textSize="12sp" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
+                android:layout_marginEnd="12dp" android:scaleType="fitCenter" android:contentDescription="Vuka Kasie-Rise and Shine" android:src="@drawable/show_vuka" />
+            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
+                android:layout_marginEnd="12dp" android:scaleType="fitCenter" android:contentDescription="EzaseQwasha Land" android:src="@drawable/show_ezaseqwasha" />
+            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
+                android:scaleType="fitCenter" android:contentDescription="Asiye 6-9 Breakfast Show" android:src="@drawable/show_asiye" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- ===== FEATURED ===== -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CURRENT SHOW"
-        android:textColor="#99FFFFFF"
-        android:textSize="12sp" />
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:text="FEATURED"
+        android:textAppearance="@style/TextAppearance.Kasie.Section" />
 
-    <TextView
-        android:id="@+id/show_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="#HomeDrive"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:background="@drawable/bg_dark_card"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/show_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="15:00 - 18:00"
-        android:textColor="#CCFFFFFF"
-        android:textSize="14sp" />
+        <FrameLayout android:layout_width="78dp" android:layout_height="78dp" android:background="@drawable/bg_art_tile">
+            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:layout_gravity="center"
+                android:contentDescription="Kasie Unplugged" android:src="@drawable/ic_mic" />
+        </FrameLayout>
+
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginStart="14dp" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="KASIE UNPLUGGED"
+                android:fontFamily="sans-serif-black" android:letterSpacing="0.1" android:textColor="@color/kasie_accent" android:textSize="10sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5dp"
+                android:text="Building from nothing" android:textAppearance="@style/TextAppearance.Kasie.CardTitle" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="3dp"
+                android:text="with Thabo Molefe &amp; Nomsa Dube" android:textColor="@color/kasie_text_secondary" android:textSize="12sp" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:text="Entrepreneur, mother and Soweto icon Nomsa Dube on the community that raised her — and why she won't leave the township behind."
+                android:textColor="@color/kasie_text_muted" android:textSize="12sp" android:lineSpacingMultiplier="1.3" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="9dp"
+                android:background="@drawable/bg_dark_card" android:paddingStart="8dp" android:paddingEnd="8dp"
+                android:paddingTop="3dp" android:paddingBottom="3dp" android:text="S3 · E7"
+                android:fontFamily="monospace" android:textColor="@color/kasie_text_secondary" android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>
