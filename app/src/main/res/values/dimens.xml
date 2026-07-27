@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Tailwind-style 4pt spacing scale -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">12dp</dimen>
+    <dimen name="space_lg">16dp</dimen>
+    <dimen name="space_xl">20dp</dimen>
+    <dimen name="space_xxl">24dp</dimen>
+    <dimen name="space_xxxl">32dp</dimen>
 
-    <!-- Simple type scale — use these instead of ad-hoc sp values -->
-    <dimen name="text_overline">11sp</dimen>
-    <dimen name="text_body">14sp</dimen>
-    <dimen name="text_title">18sp</dimen>
-    <dimen name="text_headline">22sp</dimen>
-
-    <!-- Spacing -->
-    <dimen name="spacing_standard">16dp</dimen>
-    <dimen name="spacing_section">24dp</dimen>
-
+    <!-- Text sizes -->
+    <dimen name="text_display">26sp</dimen>
+    <dimen name="text_section">15sp</dimen>
+    <dimen name="text_card_title">17sp</dimen>
+    <dimen name="text_row_title">14sp</dimen>
+    <dimen name="text_body">13sp</dimen>
+    <dimen name="text_meta">12sp</dimen>
+    <dimen name="text_mono">12sp</dimen>
 </resources>

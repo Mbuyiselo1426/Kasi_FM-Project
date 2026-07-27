@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Core brand palette (black/yellow — confirmed against kasiefm971.co.za) -->
-    <color name="kasie_background">#0D1117</color>
+    <!-- Core brand palette (accent kept at #EEC61F per design decision) -->
+    <color name="kasie_background">#0A0A0B</color>
     <color name="kasie_toolbar">#000000</color>
     <color name="kasie_accent">#EEC61F</color>
-    <color name="kasie_card_background">#1A1A2E</color>
+    <color name="kasie_accent_dim">#C9A81A</color>
+    <color name="kasie_card_background">#151519</color>
 
-    <!-- "NOW ON AIR" badge — was #87CEEB (sky blue), which didn't relate to the
-         black/yellow brand at all. Replaced with a dark pill (background color)
-         + yellow text, so the badge reads as "inverted brand", not a third hue.
-         Alternative considered: a deep goldenrod pill (#B8860B) with white text —
-         see note in the response for the tradeoff. -->
-    <color name="kasie_badge_background">#0D1117</color>
+    <!-- Added surfaces / secondary (mockup design system) -->
+    <color name="kasie_surface">#151519</color>
+    <color name="kasie_surface_high">#1D1D23</color>
+    <color name="kasie_surface_higher">#26262E</color>
+    <color name="kasie_outline">#2A2A31</color>
+    <color name="kasie_cyan">#16AADC</color>
+    <color name="kasie_schedule_now">#22EEC61F</color>
+
+    <!-- "NOW ON AIR" badge: dark pill + yellow text (inverted brand) -->
+    <color name="kasie_badge_background">#0A0A0B</color>
     <color name="kasie_badge_text">#EEC61F</color>
     <color name="kasie_badge_alt_background">#B8860B</color>
 
     <!-- Text -->
-    <color name="kasie_text_primary">#FFFFFF</color>
+    <color name="kasie_text_primary">#F5F5F6</color>
     <color name="kasie_text_secondary">#CCFFFFFF</color>
     <color name="kasie_text_muted">#99FFFFFF</color>
-    <color name="kasie_text_on_accent">#0D0F0F</color>
+    <color name="kasie_text_on_accent">#181500</color>
 
     <!-- Play button -->
     <color name="kasie_play_button_background">#0A0A0A</color>

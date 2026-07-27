@@ -1,24 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/ic_nav_home"
-        android:title="KASIE FM"/>
-
-    <item
-        android:id="@+id/nav_featured"
-        android:icon="@drawable/ic_nav_featured"
-        android:title="FEATURED"/>
-
-    <item
-        android:id="@+id/nav_highlights"
-        android:icon="@drawable/ic_nav_highlights"
-        android:title="HIGHLIGHTS"/>
-
-    <item
-        android:id="@+id/nav_connect"
-        android:icon="@drawable/ic_nav_connect"
-        android:title="CONNECT"/>
+    <!-- Labels/icons relabelled to the mockup set. IDs kept unchanged so
+         MainActivity's nav handler still compiles. Renaming IDs to
+         nav_radio / nav_podcasts / nav_community is a later MainActivity edit. -->
+    <item android:id="@+id/nav_home"       android:icon="@drawable/ic_nav_home"      android:title="Home"/>
+    <item android:id="@+id/nav_featured"   android:icon="@drawable/ic_nav_radio"     android:title="Radio"/>
+    <item android:id="@+id/nav_highlights" android:icon="@drawable/ic_nav_podcasts"  android:title="Podcasts"/>
+    <item android:id="@+id/nav_connect"    android:icon="@drawable/ic_nav_community" android:title="Community"/>
 
 </menu>

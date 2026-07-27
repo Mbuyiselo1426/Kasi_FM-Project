@@ -1,163 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0D1117">
+    android:background="@color/kasie_background">
 
+    <!-- Toolbar: logo + wordmark + search/bell -->
     <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="67dp"
-    android:background="#000000"
-    android:paddingTop="-1dp">
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/kasie_toolbar"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
 
- <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
- <ImageView
-    android:id="@+id/toolbar_logo"
-    android:layout_width="101dp"
-    android:layout_height="70dp"
-    android:layout_marginEnd="8dp"
-    android:contentDescription="@string/kasie_fm_logo"
-    android:src="@drawable/kasi_fm_logo" />
+            <ImageView
+                android:id="@+id/toolbar_logo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@string/kasie_fm_logo"
+                android:src="@drawable/kasi_fm_logo" />
 
- <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="KASIE FM"
-    android:textColor="#FFFFFF"
-    android:textSize="18sp"
-    android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
- </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KASIE FM"
+                    android:textColor="@color/kasie_text_primary"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-black"
+                    android:textSize="16sp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="97.1 · Soweto's Own"
+                    android:fontFamily="monospace"
+                    android:textColor="@color/kasie_text_muted"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/btn_search"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="9dp"
+                android:contentDescription="Search"
+                android:src="@drawable/ic_search" />
+
+            <ImageView
+                android:id="@+id/btn_notifications"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="9dp"
+                android:contentDescription="Notifications"
+                android:src="@drawable/ic_bell" />
+        </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <View
-    android:layout_width="match_parent"
-    android:layout_height="3dp"
-    android:background="#EEC61F" />
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/kasie_accent" />
 
     <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="1"
-    android:fillViewport="true">
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
- <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
- <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="194dp"
-     android:layout_marginTop="24dp"
-     android:layout_marginBottom="24dp"
-     android:background="#EEC61F"
-     android:gravity="center"
-     android:orientation="vertical">
+            <!-- ===== LIVE HERO (yellow) — keeps player-bound IDs ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_hero"
+                android:orientation="vertical"
+                android:padding="20dp">
 
- <TextView
- android:id="@+id/live_badge"
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:layout_gravity="center_horizontal"
- android:layout_marginBottom="16dp"
- android:background="#0A0A0A"
- android:gravity="center"
- android:paddingLeft="12dp"
- android:paddingTop="4dp"
- android:paddingRight="12dp"
- android:paddingBottom="4dp"
- android:text="NOW ON AIR"
- android:textColor="#EEC61F"
- android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/live_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_live_badge"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="NOW ON AIR"
+                    android:fontFamily="sans-serif-black"
+                    android:letterSpacing="0.08"
+                    android:textColor="@color/kasie_accent"
+                    android:textSize="11sp" />
 
- <Button
- android:id="@+id/playPauseButton"
- android:layout_width="56dp"
- android:layout_height="wrap_content"
- android:backgroundTint="#0a0a0a"
- android:stateListAnimator="@null"
- android:text=" "
- android:textColor="#FFFFFF"
- android:textSize="32sp"
- android:contentDescription="@string/play_action" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
- <TextView
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:layout_marginTop="12dp"
- android:text="97.1 FM"
- android:textColor="#0e0f0f"
- android:textSize="19sp" />
+                    <Button
+                        android:id="@+id/playPauseButton"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:background="@drawable/bg_play_circle"
+                        android:foreground="@drawable/ic_play"
+                        android:foregroundGravity="center"
+                        android:stateListAnimator="@null"
+                        android:text=" "
+                        android:contentDescription="@string/play_action" />
 
- </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
 
- <LinearLayout
- android:layout_width="match_parent"
- android:layout_height="wrap_content"
- android:layout_marginBottom="16dp"
- android:background="#1A1A2E"
- android:padding="16dp"
- android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Asiye 6-9 Breakfast Show"
+                            android:fontFamily="sans-serif-black"
+                            android:textStyle="bold"
+                            android:textColor="@color/kasie_text_on_accent"
+                            android:textSize="22sp" />
 
- <TextView
- android:layout_width="wrap_content"
- android:layout_height="wrap_content"
- android:text="NOW PLAYING"
- android:textSize="12sp"
- android:textColor="#99FFFFFF" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="06:00 – 09:00 · Breakfast"
+                            android:fontFamily="monospace"
+                            android:textColor="#B3181500"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
 
- <TextView
- android:id="@+id/title_text"
- android:layout_width="match_parent"
- android:layout_height="wrap_content"
- android:text="Kasie FM Live"
- android:textSize="22sp"
- android:textColor="#FFFFFF"
- android:textStyle="bold"
- android:layout_marginTop="8dp" />
+                <!-- Current track block (title/artist bound to RadioService) -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="18dp"
+                    android:background="#33181500" />
 
- <TextView
- android:id="@+id/artist_text"
- android:layout_width="match_parent"
- android:layout_height="wrap_content"
- android:text="Kasie FM"
- android:textSize="16sp"
- android:textColor="#CCFFFFFF"
- android:layout_marginTop="4dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="CURRENT TRACK"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:textColor="#A6181500"
+                    android:textSize="10sp" />
 
- </LinearLayout>
+                <TextView
+                    android:id="@+id/title_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Kasie FM Live"
+                    android:textStyle="bold"
+                    android:textColor="@color/kasie_text_on_accent"
+                    android:textSize="16sp" />
 
- <androidx.fragment.app.FragmentContainerView
- android:id="@+id/fragment_container"
- android:name="com.kasiefm.HomeFragment"
- android:layout_width="match_parent"
- android:layout_height="wrap_content"
- android:layout_marginBottom="24dp" />
+                <TextView
+                    android:id="@+id/artist_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:text="Kasie FM"
+                    android:textColor="#BF181500"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
- </LinearLayout>
-
+            <!-- Home-tab content (schedule / podcasts / featured) swaps here -->
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment_container"
+                android:name="com.kasiefm.HomeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp" />
+        </LinearLayout>
     </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
- android:id="@+id/bottom_navigation"
- android:layout_width="match_parent"
- android:layout_height="wrap_content"
- android:background="#1A1A2E"
- app:itemIconTint="#FFFFFF"
- app:itemTextColor="#FFFFFF"
- app:labelVisibilityMode="labeled"
- app:menu="@menu/bottom_nav_menu" />
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/kasie_toolbar"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
-    </LinearLayout>
+</LinearLayout>
