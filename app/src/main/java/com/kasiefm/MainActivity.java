@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Button;
 import android.widget.TextView;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.test.espresso.idling.CountingIdlingResource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,6 +41,16 @@ public class MainActivity extends AppCompatActivity {
     private RadioService radioService;
     private boolean serviceBound = false;
 
+    // Lets Espresso tests wait for RadioService to actually bind instead of
+    // racing the async bindService() callback with a sleep.
+    private static final CountingIdlingResource BINDING_IDLING_RESOURCE =
+            new CountingIdlingResource("radioServiceBinding");
+
+    @VisibleForTesting
+    public static CountingIdlingResource getIdlingResource() {
+        return BINDING_IDLING_RESOURCE;
+    }
+
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -51,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
             // trigger the listener below, so we'd otherwise be stuck showing
             // whatever the UI happened to say before this Activity was recreated.
             updateUiForState(radioService.getCurrentState());
+            if (!BINDING_IDLING_RESOURCE.isIdleNow()) {
+                BINDING_IDLING_RESOURCE.decrement();
+            }
 
             radioService.setPlaybackStateListener(new RadioService.PlaybackStateListener() {
                 @Override
@@ -195,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         // receive state callbacks while it's in the foreground.
         Intent intent = new Intent(this, RadioService.class);
         ContextCompat.startForegroundService(this, intent);
+        BINDING_IDLING_RESOURCE.increment();
         bindService(intent, connection, BIND_AUTO_CREATE);
     }
 
