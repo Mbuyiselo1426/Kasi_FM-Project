@@ -6,8 +6,9 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isClickable;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
-import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -21,10 +22,9 @@ import org.junit.runner.RunWith;
 
 /**
  * Regression test for the top-card play/pause button being non-interactive.
- * Verifies the button actually receives touch events end-to-end - a tap gets
- * routed all the way to RadioService and the service's reported state comes
- * back to update the UI - rather than being swallowed before it ever reaches
- * the OnClickListener.
+ * Checks RadioService's actual playWhenReady state after each tap rather than
+ * the UI labels - the labels only update synchronously on the pause() path,
+ * so they can't tell a swallowed tap from a real one on the play() path.
  */
 @RunWith(AndroidJUnit4.class)
 public class PlayPauseButtonTest {
@@ -46,27 +46,28 @@ public class PlayPauseButtonTest {
     @Test
     public void tappingButton_isReceivedAndTogglesPlaybackState() {
         // Idling resource has already waited for RadioService to bind, so the
-        // button should be sitting in its initial PAUSED state.
+        // button should be sitting in its initial, interactive PAUSED state.
         onView(withId(R.id.playPauseButton))
                 .check(matches(isDisplayed()))
                 .check(matches(isEnabled()))
-                .check(matches(isClickable()))
-                .check(matches(withContentDescription(R.string.play_action)));
+                .check(matches(isClickable()));
 
-        // First tap: PAUSED -> play(). This doesn't have to change the UI
-        // synchronously (LIVE depends on the player actually buffering), but
-        // it does have to be delivered to the button rather than eaten by
-        // something drawn on top of it.
+        activityRule.getScenario().onActivity(activity ->
+                assertFalse("expected not playing before any taps", activity.isPlayingForTesting()));
+
+        // First tap: not playing -> play(). Synchronously flips playWhenReady,
+        // independent of whether the stream has actually started buffering.
         onView(withId(R.id.playPauseButton)).perform(click());
 
-        // Second tap: play() already flipped RadioService's internal
-        // playWhenReady state, so this tap calls pause() instead - which
-        // synchronously reports PAUSED back to the UI. If either tap had
-        // been swallowed before reaching the button, we would not land back
-        // on the "Play" content description here.
+        activityRule.getScenario().onActivity(activity ->
+                assertTrue("first tap should have called play()", activity.isPlayingForTesting()));
+
+        // Second tap: now playing -> pause(). If either tap had been swallowed
+        // before reaching the button (e.g. by something drawn on top of it),
+        // this would still read as playing (or never-playing) instead.
         onView(withId(R.id.playPauseButton)).perform(click());
 
-        onView(withId(R.id.playPauseButton))
-                .check(matches(withContentDescription(R.string.play_action)));
+        activityRule.getScenario().onActivity(activity ->
+                assertFalse("second tap should have called pause()", activity.isPlayingForTesting()));
     }
 }

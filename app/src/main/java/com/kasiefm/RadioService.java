@@ -120,6 +120,11 @@ public class RadioService extends Service {
 
     private void initializePlayer() {
         player = new ExoPlayer.Builder(this).build();
+        // ExoPlayer defaults playWhenReady to true at construction. Without this,
+        // isPlaying()/getCurrentState() would briefly report LIVE right after bind,
+        // before resolveStreamUrlAndPrepare()'s network round-trip has a chance to
+        // set it false in prepareMedia() - set it explicitly now to close that gap.
+        player.setPlayWhenReady(false);
 
         player.addListener(new Player.Listener() {
             @SuppressLint("ForegroundServiceType")

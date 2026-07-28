@@ -51,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
         return BINDING_IDLING_RESOURCE;
     }
 
+    // Reflects RadioService's actual playWhenReady state rather than the UI
+    // labels, which only update synchronously on the pause() path - checking
+    // this directly is what proves a tap was actually routed to the service.
+    @VisibleForTesting
+    public boolean isPlayingForTesting() {
+        return serviceBound && radioService != null && radioService.isPlaying();
+    }
+
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
