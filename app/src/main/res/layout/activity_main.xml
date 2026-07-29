@@ -133,6 +133,7 @@
                             android:contentDescription="@string/play_action" />
 
                         <ImageView
+                            android:id="@+id/playPauseIcon"
                             android:layout_width="26dp"
                             android:layout_height="26dp"
                             android:layout_gravity="center"

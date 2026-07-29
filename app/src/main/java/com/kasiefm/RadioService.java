@@ -138,9 +138,17 @@ public class RadioService extends Service {
             @SuppressLint("ForegroundServiceType")
             @Override
             public void onPlaybackStateChanged(int playbackState) {
+                // prepare() passes through STATE_BUFFERING on its own, even while
+                // playWhenReady is false (the initial background resolve/prepare that
+                // runs before the user ever taps play) - only surface buffering/ready
+                // to the UI while actually trying to play, or the button gets disabled
+                // by the passive prep and there's no path back to PAUSED/enabled.
+                if (!player.getPlayWhenReady()) {
+                    return;
+                }
                 if (playbackState == Player.STATE_BUFFERING) {
                     notifyState("BUFFERING");
-                } else if (playbackState == Player.STATE_READY && player.getPlayWhenReady()) {
+                } else if (playbackState == Player.STATE_READY) {
                     reconnectAttempts = 0;
                     startForeground(NOTIFICATION_ID, createNotification("Kasie FM - Playing"));
                     notifyState("LIVE");
@@ -242,6 +250,11 @@ public class RadioService extends Service {
         }
         player.setPlayWhenReady(true);
         startForeground(NOTIFICATION_ID, createNotification("Kasie FM - Playing"));
+        // onPlaybackStateChanged only refires on an actual state transition - if
+        // background prep already reached STATE_READY while paused, flipping
+        // playWhenReady here won't trigger one, so reflect state immediately
+        // instead of waiting on a callback that may never come.
+        notifyState(player.getPlaybackState() == Player.STATE_READY ? "LIVE" : "BUFFERING");
     }
 
     public void pause() {

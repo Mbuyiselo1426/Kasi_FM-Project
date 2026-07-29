@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private Button playPauseButton;
+    private ImageView playPauseIcon;
     private TextView titleText;
     private TextView artistText;
     private BottomNavigationView bottomNavigation;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         playPauseButton.setEnabled(true);
                         playPauseButton.setText(" ");
                         playPauseButton.setContentDescription(getString(R.string.play_action));
+                        playPauseIcon.setImageResource(R.drawable.ic_play);
                         if (liveBadge != null) {
                             liveBadge.setText("OFFLINE");
                         }
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         playPauseButton = findViewById(R.id.playPauseButton);
+        playPauseIcon = findViewById(R.id.playPauseIcon);
         titleText = findViewById(R.id.title_text);
         artistText = findViewById(R.id.artist_text);
         liveBadge = findViewById(R.id.live_badge);
@@ -239,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 playPauseButton.setEnabled(true);
                 playPauseButton.setText(" ");
                 playPauseButton.setContentDescription(getString(R.string.pause_action));
+                playPauseIcon.setImageResource(R.drawable.ic_pause);
                 titleText.setText("Kasie FM Live");
                 artistText.setText("Kasie FM");
                 if (liveBadge != null) liveBadge.setText("LIVE");
@@ -251,6 +256,7 @@ public class MainActivity extends AppCompatActivity {
                 playPauseButton.setEnabled(true);
                 playPauseButton.setText(" ");
                 playPauseButton.setContentDescription(getString(R.string.play_action));
+                playPauseIcon.setImageResource(R.drawable.ic_play);
                 titleText.setText("Paused");
                 artistText.setText("Tap play to resume");
                 break;
