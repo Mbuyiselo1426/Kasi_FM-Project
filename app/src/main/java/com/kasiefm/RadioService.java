@@ -85,8 +85,16 @@ public class RadioService extends Service {
         return binder;
     }
 
+    @SuppressLint("ForegroundServiceType")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // MainActivity starts us with Context.startForegroundService(), which requires
+        // startForeground() within a few seconds of every such call or the OS ANRs/kills
+        // the process - including re-entry while this instance is already alive (e.g. the
+        // app is reopened while paused). resolveStreamUrlAndPrepare() alone can take
+        // 10-25s against the backend, so we can't wait on playback actually starting -
+        // promote immediately here; play() updates the notification once it does.
+        startForeground(NOTIFICATION_ID, createNotification(isPlaying() ? "Kasie FM - Playing" : "Kasie FM"));
         // Started (not just bound) so the service survives after the Activity unbinds.
         return START_STICKY;
     }
