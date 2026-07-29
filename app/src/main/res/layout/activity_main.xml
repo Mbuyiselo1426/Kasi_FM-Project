@@ -124,8 +124,9 @@
                         android:layout_width="68dp"
                         android:layout_height="68dp"
                         android:background="@drawable/bg_play_circle"
-                        android:foreground="@drawable/ic_play"
-                        android:foregroundGravity="center"
+                        android:drawableTop="@drawable/ic_play"
+                        android:drawablePadding="0dp"
+                        android:gravity="center"
                         android:stateListAnimator="@null"
                         android:text=" "
                         android:contentDescription="@string/play_action" />
