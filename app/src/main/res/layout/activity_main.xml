@@ -47,7 +47,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="97.1 · Soweto's Own"
+                    android:text="97.1 · Katlehong's Own"
                     android:fontFamily="monospace"
                     android:textColor="@color/kasie_text_muted"
                     android:textSize="11sp" />
@@ -119,17 +119,28 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/playPauseButton"
+                    <FrameLayout
                         android:layout_width="68dp"
-                        android:layout_height="68dp"
-                        android:background="@drawable/bg_play_circle"
-                        android:drawableTop="@drawable/ic_play"
-                        android:drawablePadding="0dp"
-                        android:gravity="center"
-                        android:stateListAnimator="@null"
-                        android:text=" "
-                        android:contentDescription="@string/play_action" />
+                        android:layout_height="68dp">
+
+                        <Button
+                            android:id="@+id/playPauseButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_play_circle"
+                            android:stateListAnimator="@null"
+                            android:text=" "
+                            android:contentDescription="@string/play_action" />
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_gravity="center"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_play" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
