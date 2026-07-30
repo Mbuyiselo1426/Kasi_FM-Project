@@ -54,6 +54,7 @@ public class RadioService extends Service {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final String CHANNEL_ID = "RadioServiceChannel";
     private static final int NOTIFICATION_ID = 1;
+    
     private static final String RADIO_STREAM_URL = "https://s44.myradiostream.com/9128/listen.mp3";
 
     // Bounded auto-reconnect: a few short-backoff attempts before we give up
