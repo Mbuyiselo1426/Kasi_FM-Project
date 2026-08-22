@@ -24,6 +24,9 @@ import com.kasiefm.api.KasieApiService;
 import com.kasiefm.api.RetrofitClient;
 import com.kasiefm.api.StreamUrls;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,7 +46,7 @@ public class RadioService extends Service {
 
     /** Callback so the UI can reflect playback state without touching the player. */
     public interface PlaybackStateListener {
-        void onStateChanged(String state); // "LIVE" | "BUFFERING" | "PAUSED"
+        void onStateChanged(String state); // "LIVE" | "BUFFERING" | "PAUSED" | "ERROR"
         void onError();
     }
 
@@ -55,17 +58,16 @@ public class RadioService extends Service {
     private static final String CHANNEL_ID = "RadioServiceChannel";
     private static final int NOTIFICATION_ID = 1;
 
-    private static final String RADIO_STREAM_URL = "https://s44.myradiostream.com/9128/listen.mp3";
-
     // Bounded auto-reconnect: a few short-backoff attempts before we give up
     // and surface onError to the UI.
     private static final int MAX_RECONNECT_ATTEMPTS = 3;
     private static final long RECONNECT_BASE_DELAY_MS = 2000L;
     private int reconnectAttempts = 0;
 
-    // Whatever URL we last successfully resolved (API or fallback constant) -
-    // reconnect attempts reuse this instead of always going back to the constant.
-    private volatile String currentStreamUrl = RADIO_STREAM_URL;
+    // A stream is never prepared until this state has accepted a valid URL from
+    // /api/stream-url. It also remembers a tap that arrives while that request
+    // is in flight.
+    private final StreamUrlResolutionState streamUrlState = new StreamUrlResolutionState();
 
     public class LocalBinder extends Binder {
         RadioService getService() {
@@ -115,6 +117,12 @@ public class RadioService extends Service {
      * you leaving the app and coming back to it.
      */
     public String getCurrentState() {
+        if (streamUrlState.hasFailed()) {
+            return "ERROR";
+        }
+        if (streamUrlState.isPlaybackRequested()) {
+            return "BUFFERING";
+        }
         if (player == null) {
             return "PAUSED";
         }
@@ -129,10 +137,8 @@ public class RadioService extends Service {
 
     private void initializePlayer() {
         player = new ExoPlayer.Builder(this).build();
-        // ExoPlayer defaults playWhenReady to true at construction. Without this,
-        // isPlaying()/getCurrentState() would briefly report LIVE right after bind,
-        // before resolveStreamUrlAndPrepare()'s network round-trip has a chance to
-        // set it false in prepareMedia() - set it explicitly now to close that gap.
+        // Keep the player paused until either the user plays an already-resolved
+        // stream or a queued play request is fulfilled after URL resolution.
         player.setPlayWhenReady(false);
 
         player.addListener(new Player.Listener() {
@@ -164,52 +170,64 @@ public class RadioService extends Service {
             }
         });
 
-        // Resolve the stream URL (API first, constant fallback) before we ever
-        // touch setMediaItem/prepare - see resolveStreamUrlAndPrepare().
+        // Resolve the stream URL before we ever touch setMediaItem/prepare.
         resolveStreamUrlAndPrepare();
     }
 
     /**
-     * Fetches /api/stream-url off the main thread; falls back to the hardcoded
-     * constant on failure or an empty response. Either way, the actual player
-     * calls are hopped back onto the main thread since ExoPlayer must be
-     * driven from the thread it was created on.
+     * Fetches /api/stream-url. The actual player calls are hopped back onto the
+     * main thread since ExoPlayer must be driven from the thread it was created
+     * on. A failed or invalid response deliberately leaves the player unprepared.
      */
     private void resolveStreamUrlAndPrepare() {
+        if (!streamUrlState.beginResolution()) {
+            return;
+        }
         KasieApiService api = RetrofitClient.getInstance().create(KasieApiService.class);
         api.getStreamUrl().enqueue(new Callback<StreamUrls>() {
             @Override
             public void onResponse(@NonNull Call<StreamUrls> call, @NonNull Response<StreamUrls> response) {
                 StreamUrls body = response.body();
-                String url = (body != null && body.getStreamUrl() != null && !body.getStreamUrl().trim().isEmpty())
-                        ? body.getStreamUrl()
-                        : RADIO_STREAM_URL;
-                Log.i(TAG, "Resolved stream URL from API: " + url);
-                mainHandler.post(() -> prepareMedia(url));
+                String url = body == null ? null : body.getStreamUrl();
+                if (!response.isSuccessful() || !isValidStreamUrl(url)) {
+                    Log.w(TAG, "Stream URL API returned an invalid response: " + response.code());
+                    mainHandler.post(RadioService.this::onStreamUrlResolutionFailed);
+                    return;
+                }
+                String resolvedUrl = url.trim();
+                Log.i(TAG, "Resolved stream URL from API");
+                mainHandler.post(() -> {
+                    boolean startPlayback = streamUrlState.completeResolution(resolvedUrl);
+                    prepareMedia(resolvedUrl, startPlayback);
+                });
             }
 
             @Override
             public void onFailure(@NonNull Call<StreamUrls> call, @NonNull Throwable t) {
-                Log.w(TAG, "Failed to fetch stream URL from API, falling back to default", t);
-                mainHandler.post(() -> prepareMedia(RADIO_STREAM_URL));
+                Log.w(TAG, "Failed to fetch stream URL from API", t);
+                mainHandler.post(RadioService.this::onStreamUrlResolutionFailed);
             }
         });
     }
 
-    /** Sets up the given URL and prepares the player, but does NOT auto-play it. */
-    private void prepareMedia(String url) {
+    private void onStreamUrlResolutionFailed() {
+        streamUrlState.failResolution();
+        notifyError();
+    }
+
+    /** Sets up a backend-resolved URL and prepares the player. */
+    private void prepareMedia(String url, boolean startPlayback) {
         if (player == null) {
             return;
         }
-        currentStreamUrl = url;
         Log.i(TAG, "Preparing stream: " + url);
         player.setMediaItem(MediaItem.fromUri(url));
+        player.setPlayWhenReady(startPlayback);
         player.prepare();
-        // Explicit: ExoPlayer's playWhenReady defaults to true, which would
-        // otherwise auto-buffer/play before the user ever taps play - and
-        // disable playPauseButton (see MainActivity#updateUiForState) while
-        // it does. Stay paused until the user asks for playback.
-        player.setPlayWhenReady(false);
+        if (startPlayback) {
+            startForeground(NOTIFICATION_ID, createNotification("Kasie FM - Playing"));
+            notifyState("BUFFERING");
+        }
     }
 
     private void attemptReconnect() {
@@ -223,16 +241,14 @@ public class RadioService extends Service {
                 if (player == null) {
                     return;
                 }
-                player.setMediaItem(MediaItem.fromUri(currentStreamUrl));
+                player.setMediaItem(MediaItem.fromUri(streamUrlState.getResolvedUrl()));
                 player.prepare();
                 player.setPlayWhenReady(true);
             }, delay);
         } else {
             Log.e(TAG, "Reconnect attempts exhausted, surfacing error to UI");
             reconnectAttempts = 0;
-            if (listener != null) {
-                listener.onError();
-            }
+            notifyError();
         }
     }
 
@@ -242,11 +258,19 @@ public class RadioService extends Service {
             return;
         }
         Log.i(TAG, "play() requested");
+        if (!streamUrlState.hasResolvedUrl()) {
+            boolean shouldResolve = streamUrlState.requestPlayback();
+            notifyState("BUFFERING");
+            if (shouldResolve) {
+                resolveStreamUrlAndPrepare();
+            }
+            return;
+        }
         if (player.getPlaybackState() == Player.STATE_IDLE) {
             // Player landed in IDLE after an exhausted reconnect (or was never
             // prepared yet) - this is the tap-to-retry path, re-prepare first.
             reconnectAttempts = 0;
-            player.setMediaItem(MediaItem.fromUri(currentStreamUrl));
+            player.setMediaItem(MediaItem.fromUri(streamUrlState.getResolvedUrl()));
             player.prepare();
         }
         player.setPlayWhenReady(true);
@@ -271,6 +295,68 @@ public class RadioService extends Service {
         if (listener != null) {
             listener.onStateChanged(state);
         }
+    }
+
+    private void notifyError() {
+        if (listener != null) {
+            listener.onError();
+        }
+    }
+
+    static boolean isValidStreamUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            URI uri = new URI(url.trim());
+            return ("https".equalsIgnoreCase(uri.getScheme()) || "http".equalsIgnoreCase(uri.getScheme()))
+                    && uri.getHost() != null;
+        } catch (URISyntaxException exception) {
+            return false;
+        }
+    }
+
+    /** Small, pure state holder so resolution behaviour stays testable without a device. */
+    static final class StreamUrlResolutionState {
+        private String resolvedUrl;
+        private boolean resolving;
+        private boolean playbackRequested;
+        private boolean failed;
+
+        boolean beginResolution() {
+            if (resolving) {
+                return false;
+            }
+            resolving = true;
+            failed = false;
+            return true;
+        }
+
+        boolean requestPlayback() {
+            playbackRequested = true;
+            return !hasResolvedUrl() && !resolving;
+        }
+
+        boolean completeResolution(String url) {
+            resolvedUrl = url;
+            resolving = false;
+            failed = false;
+            boolean shouldStartPlayback = playbackRequested;
+            playbackRequested = false;
+            return shouldStartPlayback;
+        }
+
+        void failResolution() {
+            resolvedUrl = null;
+            resolving = false;
+            playbackRequested = false;
+            failed = true;
+        }
+
+        boolean hasResolvedUrl() { return resolvedUrl != null; }
+        String getResolvedUrl() { return resolvedUrl; }
+        boolean isPlaybackRequested() { return playbackRequested; }
+        boolean hasFailed() { return failed; }
     }
 
     private Notification createNotification(String content) {

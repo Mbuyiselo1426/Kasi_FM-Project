@@ -85,17 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onError() {
-                    runOnUiThread(() -> {
-                        playPauseButton.setEnabled(true);
-                        playPauseButton.setText(" ");
-                        playPauseButton.setContentDescription(getString(R.string.play_action));
-                        playPauseIcon.setImageResource(R.drawable.ic_play);
-                        if (liveBadge != null) {
-                            liveBadge.setText("OFFLINE");
-                        }
-                        titleText.setText(getString(R.string.network_error_message));
-                        artistText.setText("Tap to retry");
-                    });
+                    runOnUiThread(MainActivity.this::showPlaybackError);
                 }
             });
         }
@@ -230,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (serviceBound) {
+            radioService.setPlaybackStateListener(null);
             unbindService(connection);
             serviceBound = false;
             // Deliberately NOT calling stopService() here - that's the whole point:
@@ -260,6 +251,21 @@ public class MainActivity extends AppCompatActivity {
                 titleText.setText("Paused");
                 artistText.setText("Tap play to resume");
                 break;
+            case "ERROR":
+                showPlaybackError();
+                break;
         }
+    }
+
+    private void showPlaybackError() {
+        playPauseButton.setEnabled(true);
+        playPauseButton.setText(" ");
+        playPauseButton.setContentDescription(getString(R.string.play_action));
+        playPauseIcon.setImageResource(R.drawable.ic_play);
+        if (liveBadge != null) {
+            liveBadge.setText("OFFLINE");
+        }
+        titleText.setText(getString(R.string.network_error_message));
+        artistText.setText("Tap to retry");
     }
 }

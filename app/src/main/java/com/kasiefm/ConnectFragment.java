@@ -81,7 +81,7 @@ public class ConnectFragment extends Fragment {
             if (msg != null) {
                 sendViaWhatsApp(msg);
             }
-        });
+        });git 
 
         smsButton.setOnClickListener(v -> {
             StudioMessage msg = buildValidatedMessage();
@@ -97,6 +97,7 @@ public class ConnectFragment extends Fragment {
         int checkedId = requestTypeGroup.getCheckedChipId();
         return checkedId == R.id.chip_song_request;
     }
+    
 
     private void updateSongFieldsVisibility() {
         songFieldsContainer.setVisibility(isSongRequestSelected() ? View.VISIBLE : View.GONE);

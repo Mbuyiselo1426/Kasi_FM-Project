@@ -4,12 +4,10 @@ Android client for the Kasie FM cloud-native radio project. Talks to the
 [Kasie FM API](https://github.com/Mbuyiselo1426/Kasifm-api) over HTTPS/JSON —
 no shared code between the two repos, only a shared API contract.
 
-> **Status note:** this is a student prototype inspired by the real Kasie FM
-> 97.1 community station (Katlehong / Thokoza, Ekurhuleni). The real station
-> has **not yet given permission** for its branding, live stream, or full
-> schedule to be used. The logo currently in this repo is theirs and used
-> only for a private demo; nothing here is public or affiliated with the
-> station until they say otherwise. See the project journey log for details.
+> **Status note:** Kasie FM 97.1 has granted permission to integrate its
+> official live stream in this project. The stream URL is resolved from the
+> station backend at playback time; the app does not embed a station stream
+> URL.
 
 ## What it does
 
@@ -60,9 +58,6 @@ required.
 
 ## Known issues
 
-- `/api/stream-url` is not yet wired into `RadioService` — it still points
-  at a SomaFM placeholder stream. This is intentional until the real Kasie
-  FM stream URL is confirmed with the station.
 - Featured / Highlights / News bottom-nav tabs currently show static
   placeholder text, not live API data — only the Home tab is wired to the
   backend so far.
@@ -71,8 +66,6 @@ required.
 
 ## Roadmap
 
-- Wire `/api/stream-url` into `RadioService` (pending Kasie FM's real stream
-  URL and permission).
 - Migrate to `androidx.media3`.
 - Data Lite mode for low-data usage.
 - Push notifications for show reminders.
