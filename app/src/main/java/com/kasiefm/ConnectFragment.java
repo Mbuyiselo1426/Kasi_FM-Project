@@ -81,7 +81,7 @@ public class ConnectFragment extends Fragment {
             if (msg != null) {
                 sendViaWhatsApp(msg);
             }
-        });git 
+        });
 
         smsButton.setOnClickListener(v -> {
             StudioMessage msg = buildValidatedMessage();
