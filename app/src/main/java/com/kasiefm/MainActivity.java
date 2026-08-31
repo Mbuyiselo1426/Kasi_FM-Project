@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -59,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
     @VisibleForTesting
     public boolean isPlayingForTesting() {
         return serviceBound && radioService != null && radioService.isPlaying();
+    }
+
+    @VisibleForTesting
+    @Nullable
+    public String getPlaybackStateForTesting() {
+        return serviceBound && radioService != null ? radioService.getCurrentState() : null;
     }
 
     private final ServiceConnection connection = new ServiceConnection() {
