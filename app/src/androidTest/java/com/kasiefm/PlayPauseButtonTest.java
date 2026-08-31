@@ -8,6 +8,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import androidx.test.espresso.IdlingRegistry;
@@ -65,13 +66,19 @@ public class PlayPauseButtonTest {
         activityRule.getScenario().onActivity(activity ->
                 assertFalse("expected not playing before any taps", activity.isPlayingForTesting()));
 
-        // Not playing -> play(). Synchronously flips playWhenReady, so this
-        // check doesn't depend on whether the stream has actually buffered -
-        // it only proves the tap reached the button's OnClickListener rather
-        // than being swallowed by something drawn on top of it.
+        // Tapping play now may either start playback immediately (if the
+        // stream URL was already resolved) or move into BUFFERING while the
+        // URL fetch completes. Either outcome proves the click reached the
+        // OnClickListener. Remaining PAUSED would mean the tap was ignored.
         onView(withId(R.id.playPauseButton)).perform(click());
 
-        activityRule.getScenario().onActivity(activity ->
-                assertTrue("tap should have called play()", activity.isPlayingForTesting()));
+        activityRule.getScenario().onActivity(activity -> {
+            String state = activity.getPlaybackStateForTesting();
+            assertNotNull("expected a bound playback state after tapping play", state);
+            assertTrue(
+                    "tap should have triggered play(), expected BUFFERING or LIVE but was " + state,
+                    "BUFFERING".equals(state) || "LIVE".equals(state)
+            );
+        });
     }
 }

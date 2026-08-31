@@ -61,6 +61,12 @@ public class MainActivity extends AppCompatActivity {
         return serviceBound && radioService != null && radioService.isPlaying();
     }
 
+    @VisibleForTesting
+    @Nullable
+    public String getPlaybackStateForTesting() {
+        return serviceBound && radioService != null ? radioService.getCurrentState() : null;
+    }
+
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
