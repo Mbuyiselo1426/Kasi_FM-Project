@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -26,6 +27,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 // Exclude transitive androidx.media pulls from ExoPlayer to avoid
@@ -51,6 +56,7 @@ dependencies {
     // of guessing with a sleep. Does not pull in the Espresso test runner itself.
     implementation("androidx.test.espresso:espresso-idling-resource:3.5.1")
 
+    testImplementation(kotlin("test"))
     testImplementation("junit:junit:4.13.2")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
