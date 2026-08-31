@@ -2,12 +2,19 @@ name: Build debug APK
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - "**"
+
+  pull_request:
+    branches:
+      - main
+
   workflow_dispatch: {}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,6 +39,7 @@ jobs:
 
   instrumented-tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
