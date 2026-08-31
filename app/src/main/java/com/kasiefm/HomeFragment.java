@@ -60,7 +60,12 @@ public class HomeFragment extends Fragment {
                     return; // fragment detached (e.g. user switched tabs) before response arrived
                 }
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
-                    Show current = response.body().get(0);
+                    Show current = ScheduleSelector.findCurrentShow(response.body());
+                    if (current == null) {
+                        showTitle.setText("Off air");
+                        showTime.setText("No live show right now");
+                        return;
+                    }
                     showTitle.setText(current.getName());
                     showTime.setText(current.getStartTime() + " - " + current.getEndTime());
                 } else {
