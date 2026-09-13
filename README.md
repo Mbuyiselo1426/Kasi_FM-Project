@@ -18,6 +18,49 @@ no shared code between the two repos, only a shared API contract.
   (`GET /api/schedule`) instead of hardcoded strings.
 - Shows loading/error states while the network call is in flight.
 
+## Current-show selection and API contract
+
+`HomeFragment` passes the schedule to `ScheduleSelector.findCurrentShow`.
+The selector scans for a show whose JSON `isCurrent` field is `true`; it
+never assumes item 0 is current and does not calculate current status from
+`startTime` / `endTime`. Missing or null flags are treated as false, and null
+list entries are ignored. If multiple shows are marked current, the first
+marked entry wins, so order independence requires at most one current show.
+
+The Android client expects `GET /api/schedule` to return objects containing
+`id`, `name`, `presenter`, `startTime`, `endTime`, `description`, and the
+boolean field named exactly `isCurrent`. The backend returns at most
+one `isCurrent: true` per response, or all false when no show is current.
+Schedule ordering is irrelevant to selection under that contract.
+
+### Implementation and verification
+
+The backend now emits `isCurrent`, evaluated once per response in
+`Africa/Johannesburg`. Intervals include their start and exclude their end;
+overnight intervals cross midnight, and equal start/end is zero duration.
+The current schema repeats all rows daily (including weekends). Overlaps
+select the lowest database ID. Responses sort by start time then ID, but
+Android selection does not depend on that order.
+
+Successful empty lists and nonempty lists with no current marker both display
+`No current show` / `No scheduled show right now`. HTTP failures and missing
+response bodies retain their separate unavailable/error states. A schedule
+gap makes no claim about whether the audio stream is broadcasting.
+
+JVM tests cover selection at each list position, null/empty inputs and flags,
+and Gson JSON mapping with shuffled responses. Backend tests verify marker
+production and Jackson serialization with a fixed clock. The backend source
+is maintained in `../Kasifm-api`; deploying it remains a separate step.
+
+Selection reflects the response instant. Automatic refresh at show boundaries
+is still a follow-up; the visible card can become stale until reloaded.
+
+Run the Android tests with a compatible JDK and Android SDK:
+
+```bash
+./gradlew :app:testDebugUnitTest --tests com.kasiefm.ScheduleSelectorTest --tests com.kasiefm.ScheduleJsonTest
+```
+
 ## Architecture — why a Service owns the player
 
 Early versions had both `MainActivity` and `RadioService` independently
