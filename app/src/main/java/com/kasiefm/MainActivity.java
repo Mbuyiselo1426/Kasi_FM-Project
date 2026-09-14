@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.test.espresso.idling.CountingIdlingResource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.kasiefm.api.Show;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +30,22 @@ public class MainActivity extends AppCompatActivity {
     private TextView artistText;
     private BottomNavigationView bottomNavigation;
     private TextView liveBadge;
+
+    /** Called by Home after the API has selected its isCurrent show. */
+    public void renderScheduleHero(@Nullable Show currentShow, @NonNull String fallbackTitle,
+                                   @NonNull String fallbackTime) {
+        TextView heroTitle = findViewById(R.id.hero_show_title);
+        TextView heroTime = findViewById(R.id.hero_show_time);
+        if (currentShow == null) {
+            heroTitle.setText(fallbackTitle);
+            heroTime.setText(fallbackTime);
+            return;
+        }
+        heroTitle.setText(currentShow.getName() == null ? "Current show" : currentShow.getName());
+        String start = currentShow.getStartTime() == null ? "" : currentShow.getStartTime();
+        String end = currentShow.getEndTime() == null ? "" : currentShow.getEndTime();
+        heroTime.setText(start + " - " + end);
+    }
 
     // Cached so switching tabs doesn't re-fetch the schedule or rebuild the
     // CONNECT form every time - each tab's Fragment instance is created once

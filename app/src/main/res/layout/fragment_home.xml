@@ -21,6 +21,7 @@
             android:textAppearance="@style/TextAppearance.Kasie.Section" />
 
         <TextView
+            android:id="@+id/full_schedule_action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Full schedule ›"
@@ -37,22 +38,23 @@
         <!-- CURRENT SHOW (bound to the API's explicit isCurrent marker) -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:gravity="center_vertical" android:orientation="horizontal" android:padding="15dp" android:background="@drawable/bg_schedule_now">
-            <TextView android:layout_width="42dp" android:layout_height="wrap_content" android:gravity="end"
+            <TextView android:id="@+id/current_show_status" android:layout_width="42dp" android:layout_height="wrap_content" android:gravity="end" android:visibility="gone"
                 android:text="ON AIR" android:fontFamily="monospace" android:textColor="@color/kasie_accent" android:textSize="10sp" />
-            <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="12dp" android:background="@drawable/dot_now" />
+            <View android:id="@+id/current_show_dot" android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="12dp" android:background="@drawable/dot_now" android:visibility="gone" />
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
                 <TextView android:id="@+id/show_title" android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="Loading schedule..." android:textAppearance="@style/TextAppearance.Kasie.RowTitle" />
                 <TextView android:id="@+id/show_time" android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:text="" android:textAppearance="@style/TextAppearance.Kasie.Meta" />
             </LinearLayout>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            <TextView android:id="@+id/current_show_on_air_badge" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"
                 android:background="@drawable/bg_onair_pill" android:paddingStart="7dp" android:paddingEnd="7dp"
                 android:paddingTop="3dp" android:paddingBottom="3dp" android:text="ON AIR"
                 android:fontFamily="sans-serif-black" android:textColor="@color/kasie_text_on_accent" android:textSize="10sp" />
         </LinearLayout>
 
         <TextView
+            android:id="@+id/schedule_section_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"

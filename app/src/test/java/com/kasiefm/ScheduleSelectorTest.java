@@ -12,6 +12,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class ScheduleSelectorTest {
 
@@ -102,6 +104,47 @@ public class ScheduleSelectorTest {
         assertEquals(first, rows.get(0));
         assertEquals(second, rows.get(1));
         assertEquals(third, rows.get(2));
+    }
+
+    @Test
+    public void nextRefresh_usesCurrentShowsEndTimeOnlyToScheduleTheRefetch() {
+        Show current = show("Breakfast", "06:00", "09:00", true);
+        long now = atJohannesburg(2026, Calendar.SEPTEMBER, 14, 8, 59);
+
+        assertEquals(68_000L, ScheduleSelector.millisUntilNextRefresh(
+                current.getEndTime(), now, 8_000L));
+    }
+
+    @Test
+    public void nextRefresh_handlesMidnightEndTimeAsTheFollowingDay() {
+        long now = atJohannesburg(2026, Calendar.SEPTEMBER, 14, 21, 0);
+
+        assertEquals(10_808_000L, ScheduleSelector.millisUntilNextRefresh("00:00", now, 8_000L));
+    }
+
+    @Test
+    public void nextRefresh_usesJohannesburgTimeRegardlessOfDefaultTimezone() {
+        TimeZone original = TimeZone.getDefault();
+        long now = atJohannesburg(2026, Calendar.SEPTEMBER, 14, 8, 59);
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("America/New_York"));
+            assertEquals(68_000L, ScheduleSelector.millisUntilNextRefresh("09:00", now, 8_000L));
+        } finally {
+            TimeZone.setDefault(original);
+        }
+    }
+
+    @Test
+    public void nextRefresh_rejectsInvalidEndTime() {
+        assertEquals(-1L, ScheduleSelector.millisUntilNextRefresh("25:00", 0L, 8_000L));
+        assertEquals(-1L, ScheduleSelector.millisUntilNextRefresh(null, 0L, 8_000L));
+    }
+
+    private static long atJohannesburg(int year, int month, int day, int hour, int minute) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Africa/Johannesburg"));
+        calendar.set(year, month, day, hour, minute, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 
     private static Show show(String name, String startTime, String endTime, Boolean isCurrent) {
