@@ -25,10 +25,12 @@ public class HomeFragment extends Fragment {
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private TextView showTitle, showTime, currentStatus;
-    private View currentDot, currentBadge, scheduleSectionTitle;
+    private TextView fullScheduleAction;
+    private View currentDot, currentBadge, scheduleContainer;
     private LinearLayout scheduleList;
     private Call<List<Show>> scheduleCall;
     private boolean hasScheduleResponse;
+    private final ScheduleExpansionState scheduleExpansionState = new ScheduleExpansionState();
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private final Runnable refreshRunnable = () -> loadSchedule(false);
 
@@ -45,8 +47,10 @@ public class HomeFragment extends Fragment {
         currentDot = view.findViewById(R.id.current_show_dot);
         currentBadge = view.findViewById(R.id.current_show_on_air_badge);
         scheduleList = view.findViewById(R.id.schedule_list);
-        scheduleSectionTitle = view.findViewById(R.id.schedule_section_title);
-        view.findViewById(R.id.full_schedule_action).setOnClickListener(v -> focusSchedule());
+        scheduleContainer = view.findViewById(R.id.schedule_container);
+        fullScheduleAction = view.findViewById(R.id.full_schedule_action);
+        fullScheduleAction.setOnClickListener(v -> toggleSchedule());
+        renderScheduleExpansion();
     }
 
     @Override public void onResume() {
@@ -59,11 +63,15 @@ public class HomeFragment extends Fragment {
         if (hidden) stopRefreshing(); else if (isResumed()) loadSchedule(!hasScheduleResponse);
     }
 
-    private void focusSchedule() {
-        if (scheduleSectionTitle == null) return;
-        scheduleSectionTitle.requestFocus();
-        scheduleSectionTitle.post(() -> scheduleSectionTitle.requestRectangleOnScreen(
-                new android.graphics.Rect(0, 0, scheduleSectionTitle.getWidth(), scheduleSectionTitle.getHeight()), true));
+    private void toggleSchedule() {
+        scheduleExpansionState.toggle();
+        renderScheduleExpansion();
+    }
+
+    private void renderScheduleExpansion() {
+        boolean expanded = scheduleExpansionState.isExpanded();
+        scheduleContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        fullScheduleAction.setText(scheduleExpansionState.getActionText());
     }
 
     /** Uses the same request/render path for initial and automatic refreshes. */
@@ -185,7 +193,7 @@ public class HomeFragment extends Fragment {
     }
     @Override public void onDestroyView() {
         stopRefreshing(); showTitle = null; showTime = null; currentStatus = null; currentDot = null;
-        currentBadge = null; scheduleList = null; scheduleSectionTitle = null;
+        currentBadge = null; scheduleList = null; scheduleContainer = null; fullScheduleAction = null;
         hasScheduleResponse = false;
         super.onDestroyView();
     }
