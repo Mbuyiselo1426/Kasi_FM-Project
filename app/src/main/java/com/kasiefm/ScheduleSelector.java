@@ -2,6 +2,8 @@ package com.kasiefm;
 
 import com.kasiefm.api.Show;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** Selects the explicitly marked current show without relying on API list order. */
@@ -22,5 +24,13 @@ public final class ScheduleSelector {
         }
 
         return null;
+    }
+
+    /** Returns the API response order unchanged for rendering today's schedule. */
+    public static List<Show> rowsInResponseOrder(List<Show> schedule) {
+        if (schedule == null || schedule.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(schedule);
     }
 }

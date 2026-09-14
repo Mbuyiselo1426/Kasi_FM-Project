@@ -5,11 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.kasiefm.api.Show;
+import com.google.gson.Gson;
 
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class ScheduleSelectorTest {
 
@@ -75,6 +77,31 @@ public class ScheduleSelectorTest {
 
         assertNotNull(result);
         assertEquals("Drive", result.getName());
+    }
+
+    @Test
+    public void showJson_mapsDayOfWeekAndCurrentMarker() {
+        Show show = new Gson().fromJson(
+                "{\"id\":10,\"name\":\"Asiye 6-9 Breakfast Show\",\"presenter\":null,"
+                        + "\"startTime\":\"06:00\",\"endTime\":\"09:00\",\"description\":null,"
+                        + "\"dayOfWeek\":\"MONDAY\",\"isCurrent\":true}",
+                Show.class);
+
+        assertEquals("MONDAY", show.getDayOfWeek());
+        assertEquals(true, show.isCurrent());
+    }
+
+    @Test
+    public void rowsInResponseOrder_preservesTheBackendOrder() {
+        Show first = show("Overnight", "00:00", "03:00", false);
+        Show second = show("Breakfast", "06:00", "09:00", true);
+        Show third = show("Drive", "15:00", "18:00", false);
+
+        List<Show> rows = ScheduleSelector.rowsInResponseOrder(Arrays.asList(first, second, third));
+
+        assertEquals(first, rows.get(0));
+        assertEquals(second, rows.get(1));
+        assertEquals(third, rows.get(2));
     }
 
     private static Show show(String name, String startTime, String endTime, Boolean isCurrent) {

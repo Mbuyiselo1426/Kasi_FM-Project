@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,6 +33,8 @@ public class HomeFragment extends Fragment {
 
     private TextView showTitle;
     private TextView showTime;
+    private LinearLayout scheduleList;
+    private Call<List<Show>> scheduleCall;
 
     @Nullable
     @Override
@@ -44,44 +48,100 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         showTitle = view.findViewById(R.id.show_title);
         showTime = view.findViewById(R.id.show_time);
+        scheduleList = view.findViewById(R.id.schedule_list);
         loadSchedule();
     }
 
     private void loadSchedule() {
         showTitle.setText("Loading schedule...");
         showTime.setText("");
+        scheduleList.removeAllViews();
+        addScheduleMessage("Loading schedule...");
 
         KasieApiService api = RetrofitClient.getInstance().create(KasieApiService.class);
 
-        api.getSchedule().enqueue(new Callback<List<Show>>() {
+        scheduleCall = api.getSchedule();
+        scheduleCall.enqueue(new Callback<List<Show>>() {
             @Override
             public void onResponse(Call<List<Show>> call, Response<List<Show>> response) {
-                if (!isAdded()) {
+                if (!isAdded() || getView() == null) {
                     return; // fragment detached (e.g. user switched tabs) before response arrived
                 }
                 if (response.isSuccessful() && response.body() != null) {
-                    Show current = ScheduleSelector.findCurrentShow(response.body());
-                    if (current == null) {
-                        showTitle.setText("No current show");
-                        showTime.setText("No scheduled show right now");
+                    List<Show> schedule = response.body();
+                    scheduleList.removeAllViews();
+                    if (schedule.isEmpty()) {
+                        showTitle.setText("No schedule available today");
+                        showTime.setText("");
+                        addScheduleMessage("No schedule available today");
                         return;
                     }
-                    showTitle.setText(current.getName());
-                    showTime.setText(current.getStartTime() + " - " + current.getEndTime());
+                    Show current = ScheduleSelector.findCurrentShow(schedule);
+                    if (current == null) {
+                        showTitle.setText("Schedule unavailable");
+                        showTime.setText("No current show right now");
+                    } else {
+                        showTitle.setText(current.getName() == null ? "Current show" : current.getName());
+                        showTime.setText(formatTime(current));
+                    }
+                    for (Show show : ScheduleSelector.rowsInResponseOrder(schedule)) {
+                        addScheduleRow(show);
+                    }
                 } else {
                     showTitle.setText("Schedule unavailable");
                     showTime.setText("");
+                    scheduleList.removeAllViews();
+                    addScheduleMessage("Schedule unavailable");
                 }
             }
 
             @Override
             public void onFailure(Call<List<Show>> call, Throwable t) {
-                if (!isAdded()) {
+                if (!isAdded() || getView() == null) {
                     return;
                 }
                 showTitle.setText("Unable to load schedule");
                 showTime.setText("Check your connection");
+                scheduleList.removeAllViews();
+                addScheduleMessage("Unable to load schedule\nCheck your connection");
             }
         });
+    }
+
+    private String formatTime(Show show) {
+        String start = show.getStartTime() == null ? "" : show.getStartTime();
+        String end = show.getEndTime() == null ? "" : show.getEndTime();
+        return start + " - " + end;
+    }
+
+    private void addScheduleMessage(String message) {
+        TextView text = new TextView(requireContext());
+        text.setText(message);
+        text.setTextColor(Color.LTGRAY);
+        text.setPadding(15, 15, 15, 15);
+        scheduleList.addView(text);
+    }
+
+    private void addScheduleRow(Show show) {
+        if (show == null) {
+            return;
+        }
+        TextView row = new TextView(requireContext());
+        row.setText(formatTime(show) + "\n" + (show.getName() == null ? "Unnamed show" : show.getName()));
+        row.setTextColor(Color.WHITE);
+        row.setTextSize(14);
+        row.setPadding(15, 15, 15, 15);
+        if (show.isCurrent()) row.setBackgroundResource(R.drawable.bg_schedule_now);
+        scheduleList.addView(row);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (scheduleCall != null) scheduleCall.cancel();
+        scheduleCall = null;
+        showTitle = null;
+        showTime = null;
+        scheduleList = null;
+        super.onDestroyView();
     }
 }
