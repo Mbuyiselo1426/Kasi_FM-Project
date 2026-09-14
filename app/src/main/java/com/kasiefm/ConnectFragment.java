@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -17,15 +18,20 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kasiefm.model.StudioMessage;
+import com.kasiefm.api.KasieApiService;
+import com.kasiefm.api.MessageRequest;
+import com.kasiefm.api.MessageResponse;
+import com.kasiefm.api.RetrofitClient;
 
 import java.util.UUID;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
- * Phase 1 of the CONNECT module: listener submits a request (song, prayer,
- * shout-out, announcement, other) and sends it via WhatsApp, SMS, or a
- * direct call - no backend involved yet. The StudioMessage model is built
- * either way, so the shape is already correct for Phase 2's
- * POST /api/stations/{stationId}/messages once that exists.
+ * Community form for listener messages. The primary action persists the
+ * selected category and fields through POST /api/messages; SMS and calling
+ * remain the existing alternate contact actions.
  *
  * TODO(kasie-fm): STUDIO_PHONE_NUMBER below is a placeholder. Do not
  * replace it with Kasie FM's real number until the station has been
@@ -47,6 +53,9 @@ public class ConnectFragment extends Fragment {
     private TextInputEditText songTitleInput;
     private TextInputEditText artistInput;
     private TextInputEditText messageInput;
+    private TextInputLayout messageInputLayout;
+    private MaterialButton sendButton;
+    private Call<MessageResponse> messageCall;
 
     @Nullable
     @Override
@@ -67,8 +76,9 @@ public class ConnectFragment extends Fragment {
         songTitleInput = view.findViewById(R.id.song_title_input);
         artistInput = view.findViewById(R.id.artist_input);
         messageInput = view.findViewById(R.id.message_input);
+        messageInputLayout = view.findViewById(R.id.message_input_layout);
 
-        MaterialButton whatsappButton = view.findViewById(R.id.send_whatsapp_button);
+        sendButton = view.findViewById(R.id.send_whatsapp_button);
         MaterialButton smsButton = view.findViewById(R.id.sms_button);
         MaterialButton callButton = view.findViewById(R.id.call_button);
 
@@ -76,10 +86,10 @@ public class ConnectFragment extends Fragment {
                 updateSongFieldsVisibility());
         updateSongFieldsVisibility(); // Song Request is checked by default in the layout
 
-        whatsappButton.setOnClickListener(v -> {
+        sendButton.setOnClickListener(v -> {
             StudioMessage msg = buildValidatedMessage();
             if (msg != null) {
-                sendViaWhatsApp(msg);
+                submitMessage(msg);
             }
         });
 
@@ -120,6 +130,7 @@ public class ConnectFragment extends Fragment {
     private StudioMessage buildValidatedMessage() {
         nameInputLayout.setError(null);
         songTitleInputLayout.setError(null);
+        messageInputLayout.setError(null);
 
         String name = trimmed(nameInput);
         String songTitle = trimmed(songTitleInput);
@@ -136,6 +147,11 @@ public class ConnectFragment extends Fragment {
         StudioMessage.MessageType type = selectedMessageType();
         if (type == StudioMessage.MessageType.SONG_REQUEST && TextUtils.isEmpty(songTitle)) {
             songTitleInputLayout.setError("Song title is required for a song request");
+            valid = false;
+        }
+
+        if (TextUtils.isEmpty(message)) {
+            messageInputLayout.setError("Message is required");
             valid = false;
         }
 
@@ -162,6 +178,50 @@ public class ConnectFragment extends Fragment {
 
     private String trimmed(TextInputEditText field) {
         return field.getText() == null ? "" : field.getText().toString().trim();
+    }
+
+    private void submitMessage(StudioMessage message) {
+        sendButton.setEnabled(false);
+        sendButton.setText("SENDING...");
+        MessageRequest request = new MessageRequest(
+                message.getListenerName(), message.getMessageType().name(), message.getMessage(),
+                message.getSongTitle(), message.getArtist());
+        messageCall = RetrofitClient.getInstance().create(KasieApiService.class).createMessage(request);
+        messageCall.enqueue(new Callback<MessageResponse>() {
+            @Override public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                if (!isAdded() || call != messageCall) return;
+                messageCall = null;
+                restoreSendButton();
+                if (response.code() == 201) {
+                    clearSubmittedForm();
+                    Toast.makeText(requireContext(), "Message sent to the studio", Toast.LENGTH_SHORT).show();
+                } else {
+                    String error = response.code() == 400 ? "Please check your message and try again"
+                            : "Unable to send message. Try again.";
+                    Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override public void onFailure(Call<MessageResponse> call, Throwable error) {
+                if (!isAdded() || call != messageCall || call.isCanceled()) return;
+                messageCall = null;
+                restoreSendButton();
+                Toast.makeText(requireContext(), "Unable to send message. Check your connection.", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void restoreSendButton() {
+        sendButton.setEnabled(true);
+        sendButton.setText("SEND MESSAGE");
+    }
+
+    private void clearSubmittedForm() {
+        nameInput.setText("");
+        songTitleInput.setText("");
+        artistInput.setText("");
+        messageInput.setText("");
+        requestTypeGroup.check(R.id.chip_song_request);
     }
 
     private String composeText(StudioMessage msg) {
@@ -207,5 +267,11 @@ public class ConnectFragment extends Fragment {
     private void callStudio() {
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + STUDIO_PHONE_NUMBER));
         startActivity(intent);
+    }
+
+    @Override public void onDestroyView() {
+        if (messageCall != null) messageCall.cancel();
+        messageCall = null;
+        super.onDestroyView();
     }
 }
