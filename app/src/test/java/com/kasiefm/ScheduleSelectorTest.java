@@ -107,6 +107,20 @@ public class ScheduleSelectorTest {
     }
 
     @Test
+    public void laterBackendResponseCanSelectANewCurrentShowWithoutReorderingRows() {
+        Show semphete = show("Semphete", "12:00", "15:00", true);
+        Show drive = show("Home Drive with Napo", "15:00", "18:00", false);
+        List<Show> before = Arrays.asList(semphete, drive);
+        List<Show> after = Arrays.asList(
+                show("Semphete", "12:00", "15:00", false),
+                show("Home Drive with Napo", "15:00", "18:00", true));
+
+        assertEquals("Semphete", ScheduleSelector.findCurrentShow(before).getName());
+        assertEquals("Home Drive with Napo", ScheduleSelector.findCurrentShow(after).getName());
+        assertEquals(after, ScheduleSelector.rowsInResponseOrder(after));
+    }
+
+    @Test
     public void nextRefresh_usesCurrentShowsEndTimeOnlyToScheduleTheRefetch() {
         Show current = show("Breakfast", "06:00", "09:00", true);
         long now = atJohannesburg(2026, Calendar.SEPTEMBER, 14, 8, 59);

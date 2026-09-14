@@ -23,12 +23,14 @@ import retrofit2.Response;
 /** Home schedule UI. The API's isCurrent flag is the sole current-show authority. */
 public class HomeFragment extends Fragment {
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
+    private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private TextView showTitle, showTime, currentStatus;
     private View currentDot, currentBadge, scheduleSectionTitle;
     private LinearLayout scheduleList;
     private Call<List<Show>> scheduleCall;
+    private boolean hasScheduleResponse;
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
-    private final Runnable refreshRunnable = this::loadSchedule;
+    private final Runnable refreshRunnable = () -> loadSchedule(false);
 
     @Nullable @Override public View onCreateView(@NonNull LayoutInflater inflater,
             @Nullable ViewGroup container, @Nullable Bundle state) {
@@ -47,11 +49,14 @@ public class HomeFragment extends Fragment {
         view.findViewById(R.id.full_schedule_action).setOnClickListener(v -> focusSchedule());
     }
 
-    @Override public void onResume() { super.onResume(); if (!isHidden()) loadSchedule(); }
+    @Override public void onResume() {
+        super.onResume();
+        if (!isHidden()) loadSchedule(!hasScheduleResponse);
+    }
     @Override public void onPause() { stopRefreshing(); super.onPause(); }
     @Override public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (hidden) stopRefreshing(); else if (isResumed()) loadSchedule();
+        if (hidden) stopRefreshing(); else if (isResumed()) loadSchedule(!hasScheduleResponse);
     }
 
     private void focusSchedule() {
@@ -61,23 +66,30 @@ public class HomeFragment extends Fragment {
                 new android.graphics.Rect(0, 0, scheduleSectionTitle.getWidth(), scheduleSectionTitle.getHeight()), true));
     }
 
-    private void loadSchedule() {
+    /** Uses the same request/render path for initial and automatic refreshes. */
+    private void loadSchedule(boolean showLoadingState) {
         if (!isHomeVisible()) return;
         stopRefreshTimer();
         if (scheduleCall != null) scheduleCall.cancel();
-        renderLoadingState();
+        if (showLoadingState) renderLoadingState();
         scheduleCall = RetrofitClient.getInstance().create(KasieApiService.class).getSchedule();
         scheduleCall.enqueue(new Callback<List<Show>>() {
             @Override public void onResponse(Call<List<Show>> call, Response<List<Show>> response) {
                 if (!canRender(call)) return;
                 scheduleCall = null;
-                if (!response.isSuccessful() || response.body() == null) renderHttpErrorState();
-                else renderSchedule(response.body());
+                if (!response.isSuccessful() || response.body() == null) {
+                    if (showLoadingState) renderHttpErrorState();
+                    scheduleRetry();
+                } else {
+                    hasScheduleResponse = true;
+                    renderSchedule(response.body());
+                }
             }
             @Override public void onFailure(Call<List<Show>> call, Throwable error) {
                 if (!canRender(call) || call.isCanceled()) return;
                 scheduleCall = null;
-                renderNetworkErrorState();
+                if (showLoadingState) renderNetworkErrorState();
+                scheduleRetry();
             }
         });
     }
@@ -96,7 +108,9 @@ public class HomeFragment extends Fragment {
         if (schedule.isEmpty()) {
             updateCurrentShowCard(null, "No schedule available today", "");
             updateHero(null, "No schedule available today", "");
-            addScheduleMessage("No schedule available today"); return;
+            addScheduleMessage("No schedule available today");
+            scheduleRetry();
+            return;
         }
         Show currentShow = ScheduleSelector.findCurrentShow(schedule);
         if (currentShow == null) {
@@ -107,6 +121,7 @@ public class HomeFragment extends Fragment {
         }
         for (Show show : ScheduleSelector.rowsInResponseOrder(schedule)) addScheduleRow(show);
         if (currentShow != null) scheduleNextRefresh(currentShow);
+        else scheduleRetry();
     }
 
     private void updateHero(@Nullable Show show, String title, String time) {
@@ -136,7 +151,16 @@ public class HomeFragment extends Fragment {
     private void scheduleNextRefresh(Show currentShow) {
         long delay = ScheduleSelector.millisUntilNextRefresh(currentShow.getEndTime(),
                 System.currentTimeMillis(), REFRESH_GRACE_MILLIS);
-        if (delay > 0L && isHomeVisible()) refreshHandler.postDelayed(refreshRunnable, delay);
+        scheduleRefresh(delay);
+    }
+    private void scheduleRetry() {
+        scheduleRefresh(REFRESH_RETRY_MILLIS);
+    }
+    private void scheduleRefresh(long delayMillis) {
+        stopRefreshTimer();
+        if (delayMillis > 0L && isHomeVisible()) {
+            refreshHandler.postDelayed(refreshRunnable, delayMillis);
+        }
     }
     private void stopRefreshTimer() { refreshHandler.removeCallbacks(refreshRunnable); }
     private void stopRefreshing() {
@@ -161,6 +185,8 @@ public class HomeFragment extends Fragment {
     }
     @Override public void onDestroyView() {
         stopRefreshing(); showTitle = null; showTime = null; currentStatus = null; currentDot = null;
-        currentBadge = null; scheduleList = null; scheduleSectionTitle = null; super.onDestroyView();
+        currentBadge = null; scheduleList = null; scheduleSectionTitle = null;
+        hasScheduleResponse = false;
+        super.onDestroyView();
     }
 }
