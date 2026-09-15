@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment homeFragment;
     private Fragment featuredFragment;
     private Fragment highlightsFragment;
+    private PodcastFragment podcastsFragment;
     private Fragment connectFragment;
     private Fragment activeFragment;
 
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
             if (radioService.isPlaying()) {
                 radioService.pause();
             } else {
+                pausePodcastPlayback();
                 radioService.play();
             }
         });
@@ -165,6 +167,10 @@ public class MainActivity extends AppCompatActivity {
             homeFragment = getSupportFragmentManager().findFragmentByTag("home");
             featuredFragment = getSupportFragmentManager().findFragmentByTag("featured");
             highlightsFragment = getSupportFragmentManager().findFragmentByTag("highlights");
+            Fragment restoredPodcasts = getSupportFragmentManager().findFragmentByTag("podcasts");
+            if (restoredPodcasts instanceof PodcastFragment) {
+                podcastsFragment = (PodcastFragment) restoredPodcasts;
+            }
             connectFragment = getSupportFragmentManager().findFragmentByTag("connect");
         }
 
@@ -185,11 +191,10 @@ public class MainActivity extends AppCompatActivity {
                 showFragment(featuredFragment, "featured");
                 return true;
             } else if (itemId == R.id.nav_highlights) {
-                if (highlightsFragment == null) {
-                    highlightsFragment = SimpleContentFragment.newInstance(
-                            "TODAY'S HIGHLIGHTS", "Top Moments", "The best bits from today");
+                if (podcastsFragment == null) {
+                    podcastsFragment = new PodcastFragment();
                 }
-                showFragment(highlightsFragment, "highlights");
+                showFragment(podcastsFragment, "podcasts");
                 return true;
             } else if (itemId == R.id.nav_connect) {
                 if (connectFragment == null) {
@@ -219,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
         if (!fragment.isAdded()) {
             transaction.add(R.id.fragment_container, fragment, tag);
         }
-        for (Fragment existing : new Fragment[]{homeFragment, featuredFragment, highlightsFragment, connectFragment}) {
+        for (Fragment existing : new Fragment[]{homeFragment, featuredFragment, highlightsFragment,
+                podcastsFragment, connectFragment}) {
             if (existing != null && existing != fragment && existing.isAdded()) {
                 transaction.hide(existing);
             }
@@ -227,6 +233,19 @@ public class MainActivity extends AppCompatActivity {
         transaction.show(fragment);
         transaction.commit();
         activeFragment = fragment;
+    }
+
+    /** Called before podcast playback starts so the app never plays two streams at once. */
+    public void pauseLiveRadioForPodcast() {
+        if (serviceBound && radioService != null && radioService.isPlaying()) {
+            radioService.pause();
+        }
+    }
+
+    private void pausePodcastPlayback() {
+        if (podcastsFragment != null) {
+            podcastsFragment.pausePlayback();
+        }
     }
 
     @Override

@@ -15,4 +15,7 @@ public interface KasieApiService {
 
     @GET("/api/stream-url")
     Call<StreamUrls> getStreamUrl();
+
+    @GET("/api/podcasts")
+    Call<List<PodcastEpisode>> getPodcasts();
 }
