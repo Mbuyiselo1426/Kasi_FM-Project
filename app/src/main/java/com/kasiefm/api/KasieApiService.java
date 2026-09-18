@@ -18,4 +18,7 @@ public interface KasieApiService {
 
     @GET("/api/podcasts")
     Call<List<PodcastEpisode>> getPodcasts();
+
+    @GET("/api/shows")
+    Call<List<RadioShow>> getShows();
 }

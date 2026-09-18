@@ -72,7 +72,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ===== PODCASTS ===== -->
+    <!-- ===== SHOWS ===== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,9 +81,18 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-            android:text="PODCASTS" android:textAppearance="@style/TextAppearance.Kasie.Section" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View all ›" android:textColor="@color/kasie_cyan" android:textSize="12sp" />
+            android:text="SHOWS" android:textAppearance="@style/TextAppearance.Kasie.Section" />
+        <TextView android:id="@+id/view_all_shows_action" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="View all ›" android:textColor="@color/kasie_cyan" android:textSize="12sp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/shows_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="Loading shows..."
+        android:textColor="@color/kasie_text_secondary"
+        android:textSize="12sp" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -91,17 +100,10 @@
         android:scrollbars="none">
 
         <LinearLayout
+            android:id="@+id/shows_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
-                android:layout_marginEnd="12dp" android:scaleType="fitCenter" android:contentDescription="Vuka Kasie-Rise and Shine" android:src="@drawable/show_vuka" />
-            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
-                android:layout_marginEnd="12dp" android:scaleType="fitCenter" android:contentDescription="EzaseQwasha Land" android:src="@drawable/show_ezaseqwasha" />
-            <ImageView android:layout_width="210dp" android:layout_height="wrap_content" android:adjustViewBounds="true"
-                android:scaleType="fitCenter" android:contentDescription="Asiye 6-9 Breakfast Show" android:src="@drawable/show_asiye" />
-        </LinearLayout>
+            android:orientation="horizontal" />
     </HorizontalScrollView>
 
     <!-- ===== FEATURED ===== -->

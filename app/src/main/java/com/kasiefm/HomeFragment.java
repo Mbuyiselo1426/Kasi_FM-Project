@@ -1,18 +1,23 @@
 package com.kasiefm;
 
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.bumptech.glide.Glide;
 import com.kasiefm.api.KasieApiService;
+import com.kasiefm.api.RadioShow;
 import com.kasiefm.api.RetrofitClient;
 import com.kasiefm.api.Show;
 import java.util.List;
@@ -24,11 +29,15 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
+    private static final int SHOW_PREVIEW_COUNT = 4;
     private TextView showTitle, showTime, currentStatus;
     private TextView fullScheduleAction;
     private View currentDot, currentBadge, scheduleContainer;
     private LinearLayout scheduleList;
+    private LinearLayout showsList;
+    private TextView showsStatus;
     private Call<List<Show>> scheduleCall;
+    private Call<List<RadioShow>> showsCall;
     private boolean hasScheduleResponse;
     private final ScheduleExpansionState scheduleExpansionState = new ScheduleExpansionState();
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
@@ -51,6 +60,9 @@ public class HomeFragment extends Fragment {
         fullScheduleAction = view.findViewById(R.id.full_schedule_action);
         fullScheduleAction.setOnClickListener(v -> toggleSchedule());
         renderScheduleExpansion();
+        showsList = view.findViewById(R.id.shows_list);
+        showsStatus = view.findViewById(R.id.shows_status);
+        loadShows();
     }
 
     @Override public void onResume() {
@@ -156,6 +168,126 @@ public class HomeFragment extends Fragment {
         scheduleList.removeAllViews(); addScheduleMessage("Unable to load schedule\nCheck your connection");
     }
 
+    private void loadShows() {
+        if (!isAdded() || getView() == null) return;
+        if (showsCall != null) showsCall.cancel();
+        renderShowsLoading();
+        showsCall = RetrofitClient.getInstance().create(KasieApiService.class).getShows();
+        showsCall.enqueue(new Callback<List<RadioShow>>() {
+            @Override public void onResponse(Call<List<RadioShow>> call,
+                                             Response<List<RadioShow>> response) {
+                if (!canRenderShows(call)) return;
+                showsCall = null;
+                if (!response.isSuccessful() || response.body() == null) {
+                    renderShowsError();
+                    return;
+                }
+                renderShows(response.body());
+            }
+
+            @Override public void onFailure(Call<List<RadioShow>> call, Throwable error) {
+                if (!canRenderShows(call) || call.isCanceled()) return;
+                showsCall = null;
+                renderShowsError();
+            }
+        });
+    }
+
+    private boolean canRenderShows(Call<List<RadioShow>> call) {
+        return call == showsCall && isAdded() && getView() != null;
+    }
+
+    private void renderShowsLoading() {
+        showsList.removeAllViews();
+        showsStatus.setText("Loading shows...");
+        showsStatus.setVisibility(View.VISIBLE);
+        showsStatus.setOnClickListener(null);
+    }
+
+    private void renderShows(List<RadioShow> shows) {
+        showsList.removeAllViews();
+        int rendered = 0;
+        for (RadioShow show : shows) {
+            if (show == null) continue;
+            addShowCard(show);
+            if (++rendered == SHOW_PREVIEW_COUNT) break;
+        }
+        if (rendered == 0) {
+            showsStatus.setText("No shows available right now.");
+            showsStatus.setVisibility(View.VISIBLE);
+        } else {
+            showsStatus.setVisibility(View.GONE);
+        }
+        showsStatus.setOnClickListener(null);
+    }
+
+    private void renderShowsError() {
+        showsList.removeAllViews();
+        showsStatus.setText("Unable to load shows. Tap to retry.");
+        showsStatus.setVisibility(View.VISIBLE);
+        showsStatus.setOnClickListener(v -> loadShows());
+    }
+
+    private void addShowCard(RadioShow show) {
+        LinearLayout card = new LinearLayout(requireContext());
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackgroundResource(R.drawable.bg_dark_card);
+        card.setPadding(dp(10), dp(10), dp(10), dp(12));
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(180),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        cardParams.setMarginEnd(dp(12));
+
+        FrameLayout artworkFrame = new FrameLayout(requireContext());
+        artworkFrame.setBackgroundResource(R.drawable.bg_art_tile);
+        ImageView fallbackArtwork = new ImageView(requireContext());
+        fallbackArtwork.setImageResource(R.drawable.ic_mic);
+        artworkFrame.addView(fallbackArtwork, new FrameLayout.LayoutParams(dp(30), dp(30),
+                android.view.Gravity.CENTER));
+        ImageView artwork = new ImageView(requireContext());
+        artwork.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        artwork.setContentDescription(ShowPreviewFormatter.showName(show) + " artwork");
+        artworkFrame.addView(artwork, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(108)));
+        card.addView(artworkFrame, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(108)));
+
+        String imageUrl = show.getImageUrl();
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            Glide.with(this)
+                    .load(imageUrl)
+                    .centerCrop()
+                    .placeholder(new ColorDrawable(Color.TRANSPARENT))
+                    .error(new ColorDrawable(Color.TRANSPARENT))
+                    .into(artwork);
+        }
+
+        TextView name = new TextView(requireContext());
+        name.setText(ShowPreviewFormatter.showName(show));
+        name.setTextAppearance(R.style.TextAppearance_Kasie_RowTitle);
+        name.setMaxLines(2);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        nameParams.topMargin = dp(10);
+        card.addView(name, nameParams);
+
+        String presenter = ShowPreviewFormatter.presenterText(show);
+        if (!presenter.isEmpty()) {
+            TextView presenterView = new TextView(requireContext());
+            presenterView.setText(presenter);
+            presenterView.setTextColor(Color.LTGRAY);
+            presenterView.setTextSize(12);
+            LinearLayout.LayoutParams presenterParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            presenterParams.topMargin = dp(4);
+            card.addView(presenterView, presenterParams);
+        }
+        showsList.addView(card, cardParams);
+    }
+
+    private int dp(int value) {
+        return Math.round(value * requireContext().getResources().getDisplayMetrics().density);
+    }
+
     private void scheduleNextRefresh(Show currentShow) {
         long delay = ScheduleSelector.millisUntilNextRefresh(currentShow.getEndTime(),
                 System.currentTimeMillis(), REFRESH_GRACE_MILLIS);
@@ -192,8 +324,12 @@ public class HomeFragment extends Fragment {
         scheduleList.addView(row);
     }
     @Override public void onDestroyView() {
-        stopRefreshing(); showTitle = null; showTime = null; currentStatus = null; currentDot = null;
+        stopRefreshing();
+        if (showsCall != null) showsCall.cancel();
+        showsCall = null;
+        showTitle = null; showTime = null; currentStatus = null; currentDot = null;
         currentBadge = null; scheduleList = null; scheduleContainer = null; fullScheduleAction = null;
+        showsList = null; showsStatus = null;
         hasScheduleResponse = false;
         super.onDestroyView();
     }
