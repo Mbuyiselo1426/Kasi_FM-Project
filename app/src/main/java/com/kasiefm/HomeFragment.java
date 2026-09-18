@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -34,6 +35,10 @@ import retrofit2.Response;
 /** Home schedule UI. The API's isCurrent flag is the sole current-show authority. */
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
+    private static final String ASIMDUMISE_NAME = "Asimdumise";
+    private static final String ASIMDUMISE_CLOUDINARY_URL =
+            "https://res.cloudinary.com/dtbpwk3j/image/upload/v1789736933/"
+                    + "kasiefm/shows/asidmumise.webp";
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private static final int SHOW_PREVIEW_COUNT = 4;
@@ -259,9 +264,22 @@ public class HomeFragment extends Fragment {
         card.addView(artworkFrame, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(108)));
 
-        String imageUrl = show.getImageUrl();
-        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-            String showName = ShowPreviewFormatter.showName(show);
+        String imageUrl = show.getImageUrl() == null ? null : show.getImageUrl().trim();
+        String showName = ShowPreviewFormatter.showName(show);
+        boolean isAsimdumise = ASIMDUMISE_NAME.equalsIgnoreCase(showName.trim());
+        if (isAsimdumise) {
+            if (imageUrl == null || imageUrl.isEmpty()) {
+                Toast.makeText(artwork.getContext(), "ASIMDUMISE: URL MISSING", Toast.LENGTH_LONG)
+                        .show();
+            } else if (ASIMDUMISE_CLOUDINARY_URL.equals(imageUrl)) {
+                Toast.makeText(artwork.getContext(), "ASIMDUMISE: CLOUDINARY URL RECEIVED",
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(artwork.getContext(), "ASIMDUMISE: OLD URL RECEIVED",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+        if (imageUrl != null && !imageUrl.isEmpty()) {
             Log.d(TAG, "Loading show artwork: show=" + showName + ", url=" + imageUrl);
             Glide.with(this)
                     .load(imageUrl)
@@ -275,6 +293,10 @@ public class HomeFragment extends Fragment {
                             fallbackArtwork.setVisibility(View.VISIBLE);
                             Log.e(TAG, "Show artwork failed: show=" + showName + ", url=" + imageUrl,
                                     error);
+                            if (isAsimdumise) {
+                                Toast.makeText(artwork.getContext(), "ASIMDUMISE ARTWORK FAILED",
+                                        Toast.LENGTH_LONG).show();
+                            }
                             return false;
                         }
 
@@ -285,6 +307,10 @@ public class HomeFragment extends Fragment {
                             artwork.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Show artwork loaded: show=" + showName + ", url="
                                     + imageUrl + ", source=" + dataSource);
+                            if (isAsimdumise) {
+                                Toast.makeText(artwork.getContext(), "ASIMDUMISE ARTWORK LOADED",
+                                        Toast.LENGTH_LONG).show();
+                            }
                             return false;
                         }
                     })
