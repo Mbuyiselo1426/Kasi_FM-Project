@@ -1,17 +1,25 @@
 package com.kasiefm;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.kasiefm.api.FeaturedContent;
 import com.kasiefm.api.KasieApiService;
 import com.kasiefm.api.RadioShow;
@@ -34,8 +42,9 @@ public class HomeFragment extends Fragment {
     private LinearLayout scheduleList;
     private LinearLayout showsList;
     private TextView showsStatus;
-    private TextView featuredStatus, featuredType, featuredTitle, featuredSummary;
-    private View featuredCard;
+    private TextView featuredStatus;
+    private View featuredScroll;
+    private LinearLayout featuredList;
     private Call<List<Show>> scheduleCall;
     private Call<List<RadioShow>> showsCall;
     private Call<List<FeaturedContent>> featuredCall;
@@ -65,10 +74,8 @@ public class HomeFragment extends Fragment {
         showsStatus = view.findViewById(R.id.shows_status);
         loadShows();
         featuredStatus = view.findViewById(R.id.featured_status);
-        featuredCard = view.findViewById(R.id.featured_card);
-        featuredType = view.findViewById(R.id.featured_type);
-        featuredTitle = view.findViewById(R.id.featured_title);
-        featuredSummary = view.findViewById(R.id.featured_summary);
+        featuredScroll = view.findViewById(R.id.featured_scroll);
+        featuredList = view.findViewById(R.id.featured_list);
         loadFeatured();
     }
 
@@ -249,9 +256,7 @@ public class HomeFragment extends Fragment {
                     renderFeaturedError();
                     return;
                 }
-                FeaturedContent newest = firstFeatured(response.body());
-                if (newest == null) renderFeaturedEmpty();
-                else renderFeatured(newest);
+                renderFeatured(response.body());
             }
 
             @Override public void onFailure(Call<List<FeaturedContent>> call, Throwable error) {
@@ -266,41 +271,157 @@ public class HomeFragment extends Fragment {
         return call == featuredCall && isAdded() && getView() != null;
     }
 
-    @Nullable private FeaturedContent firstFeatured(List<FeaturedContent> content) {
-        for (FeaturedContent item : content) if (item != null) return item;
-        return null;
-    }
-
     private void renderFeaturedLoading() {
-        featuredCard.setVisibility(View.GONE);
+        featuredList.removeAllViews();
+        featuredScroll.setVisibility(View.GONE);
         featuredStatus.setText("Loading featured content...");
         featuredStatus.setVisibility(View.VISIBLE);
     }
 
-    private void renderFeatured(FeaturedContent content) {
-        featuredType.setText(readableType(content.getType()));
-        featuredTitle.setText(nonBlank(content.getTitle(), "Featured content"));
-        String summary = nonBlank(content.getSummary(), "");
-        featuredSummary.setText(summary);
-        featuredSummary.setVisibility(summary.isEmpty() ? View.GONE : View.VISIBLE);
+    private void renderFeatured(List<FeaturedContent> content) {
+        featuredList.removeAllViews();
+        int rendered = 0;
+        for (FeaturedContent item : content) {
+            if (item == null) continue;
+            addFeaturedCard(item);
+            rendered++;
+        }
+        if (rendered == 0) {
+            renderFeaturedEmpty();
+            return;
+        }
         featuredStatus.setVisibility(View.GONE);
-        featuredCard.setVisibility(View.VISIBLE);
+        featuredScroll.setVisibility(View.VISIBLE);
     }
 
     private void renderFeaturedEmpty() {
-        featuredCard.setVisibility(View.GONE);
+        featuredList.removeAllViews();
+        featuredScroll.setVisibility(View.GONE);
         featuredStatus.setText("No featured content right now.");
         featuredStatus.setVisibility(View.VISIBLE);
     }
 
     private void renderFeaturedError() {
-        featuredCard.setVisibility(View.GONE);
+        featuredList.removeAllViews();
+        featuredScroll.setVisibility(View.GONE);
         featuredStatus.setText("Featured content is unavailable right now.");
         featuredStatus.setVisibility(View.VISIBLE);
     }
 
+    private void addFeaturedCard(FeaturedContent content) {
+        LinearLayout card = new LinearLayout(requireContext());
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackgroundResource(R.drawable.bg_dark_card);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(220),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        cardParams.setMarginEnd(dp(12));
+
+        FrameLayout imageArea = new FrameLayout(requireContext());
+        imageArea.setBackgroundResource(R.drawable.bg_art_tile);
+        TextView fallback = new TextView(requireContext());
+        fallback.setText("KASIE FM\nFEATURED");
+        fallback.setGravity(android.view.Gravity.CENTER);
+        fallback.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        fallback.setTextColor(requireContext().getColor(R.color.kasie_accent));
+        fallback.setTextSize(11);
+        fallback.setLetterSpacing(0.08f);
+        fallback.setTypeface(android.graphics.Typeface.MONOSPACE);
+        imageArea.addView(fallback, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        ImageView image = new ImageView(requireContext());
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        image.setContentDescription(nonBlank(content.getTitle(), "Featured content"));
+        image.setVisibility(View.GONE);
+        imageArea.addView(image, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        card.addView(imageArea, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(124)));
+
+        LinearLayout details = new LinearLayout(requireContext());
+        details.setOrientation(LinearLayout.VERTICAL);
+        details.setPadding(dp(14), dp(12), dp(14), dp(14));
+
+        TextView type = new TextView(requireContext());
+        type.setText(readableType(content.getType()));
+        type.setTextColor(requireContext().getColor(R.color.kasie_accent));
+        type.setTextSize(10);
+        type.setLetterSpacing(0.1f);
+        type.setTypeface(android.graphics.Typeface.MONOSPACE);
+        details.addView(type);
+
+        TextView title = new TextView(requireContext());
+        title.setText(nonBlank(content.getTitle(), "Featured content"));
+        title.setTextAppearance(R.style.TextAppearance_Kasie_CardTitle);
+        title.setMaxLines(2);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        titleParams.topMargin = dp(6);
+        details.addView(title, titleParams);
+
+        String summaryText = nonBlank(content.getSummary(), "");
+        if (!summaryText.isEmpty()) {
+            TextView summary = new TextView(requireContext());
+            summary.setText(summaryText);
+            summary.setTextColor(requireContext().getColor(R.color.kasie_text_muted));
+            summary.setTextSize(12);
+            summary.setLineSpacing(0f, 1.2f);
+            summary.setMaxLines(3);
+            LinearLayout.LayoutParams summaryParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            summaryParams.topMargin = dp(8);
+            details.addView(summary, summaryParams);
+        }
+
+        TextView action = new TextView(requireContext());
+        action.setText(featuredAction(content.getType()));
+        action.setTextColor(requireContext().getColor(R.color.kasie_accent));
+        action.setTextSize(11);
+        action.setTypeface(android.graphics.Typeface.MONOSPACE);
+        LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        actionParams.topMargin = dp(12);
+        details.addView(action, actionParams);
+
+        card.addView(details, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        loadFeaturedImage(content.getImageUrl(), image, fallback);
+        featuredList.addView(card, cardParams);
+    }
+
+    private void loadFeaturedImage(String imageUrl, ImageView image, TextView fallback) {
+        String url = nonBlank(imageUrl, "");
+        if (url.isEmpty()) return;
+        Glide.with(this)
+                .load(url)
+                .centerCrop()
+                .listener(new RequestListener<Drawable>() {
+                    @Override public boolean onLoadFailed(@Nullable GlideException error, Object model,
+                            Target<Drawable> target, boolean isFirstResource) {
+                        image.setVisibility(View.GONE);
+                        fallback.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+
+                    @Override public boolean onResourceReady(Drawable resource, Object model,
+                            Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        fallback.setVisibility(View.GONE);
+                        image.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .into(image);
+    }
+
     private String readableType(String type) {
         return nonBlank(type, "Featured").replace('_', ' ').toUpperCase(Locale.US);
+    }
+
+    private String featuredAction(String type) {
+        String normalizedType = nonBlank(type, "").toUpperCase(Locale.US);
+        if ("EVENT".equals(normalizedType)) return "DETAILS →";
+        if ("FEATURED_SHOW".equals(normalizedType)) return "VIEW SHOW →";
+        return "READ →";
     }
 
     private String nonBlank(String value, String fallback) {
@@ -397,8 +518,7 @@ public class HomeFragment extends Fragment {
         showTitle = null; showTime = null; currentStatus = null; currentDot = null;
         currentBadge = null; scheduleList = null; scheduleContainer = null; fullScheduleAction = null;
         showsList = null; showsStatus = null;
-        featuredCard = null; featuredStatus = null; featuredType = null; featuredTitle = null;
-        featuredSummary = null;
+        featuredStatus = null; featuredScroll = null; featuredList = null;
         hasScheduleResponse = false;
         super.onDestroyView();
     }

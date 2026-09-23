@@ -114,13 +114,29 @@
     </HorizontalScrollView>
 
     <!-- ===== FEATURED ===== -->
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="12dp"
-        android:text="FEATURED"
-        android:textAppearance="@style/TextAppearance.Kasie.Section" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="FEATURED"
+            android:textAppearance="@style/TextAppearance.Kasie.Section" />
+
+        <TextView
+            android:id="@+id/view_all_featured_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View All ›"
+            android:textColor="@color/kasie_cyan"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/featured_status"
@@ -130,41 +146,19 @@
         android:textColor="@color/kasie_text_secondary"
         android:textSize="12sp" />
 
-    <LinearLayout
-        android:id="@+id/featured_card"
+    <HorizontalScrollView
+        android:id="@+id/featured_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_dark_card"
-        android:layout_marginTop="10dp"
-        android:orientation="vertical"
-        android:padding="16dp"
+        android:scrollbars="none"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/featured_type"
+        <LinearLayout
+            android:id="@+id/featured_list"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:letterSpacing="0.1"
-            android:textColor="@color/kasie_accent"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/featured_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textAppearance="@style/TextAppearance.Kasie.CardTitle" />
-
-        <TextView
-            android:id="@+id/featured_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:lineSpacingMultiplier="1.3"
-            android:textColor="@color/kasie_text_muted"
-            android:textSize="12sp" />
-    </LinearLayout>
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
 
 </LinearLayout>
 </androidx.core.widget.NestedScrollView>
