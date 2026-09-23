@@ -1,28 +1,17 @@
 package com.kasiefm;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.kasiefm.api.KasieApiService;
 import com.kasiefm.api.RadioShow;
 import com.kasiefm.api.RetrofitClient;
@@ -34,11 +23,6 @@ import retrofit2.Response;
 
 /** Home schedule UI. The API's isCurrent flag is the sole current-show authority. */
 public class HomeFragment extends Fragment {
-    private static final String TAG = "HomeFragment";
-    private static final String ASIMDUMISE_NAME = "Asimdumise";
-    private static final String ASIMDUMISE_CLOUDINARY_URL =
-            "https://res.cloudinary.com/dtbpwk3j/image/upload/v1789736933/"
-                    + "kasiefm/shows/asidmumise.webp";
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private static final int SHOW_PREVIEW_COUNT = 4;
@@ -244,80 +228,19 @@ public class HomeFragment extends Fragment {
         LinearLayout card = new LinearLayout(requireContext());
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackgroundResource(R.drawable.bg_dark_card);
-        card.setPadding(dp(10), dp(10), dp(10), dp(12));
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setMinimumHeight(dp(128));
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(180),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         cardParams.setMarginEnd(dp(12));
 
-        FrameLayout artworkFrame = new FrameLayout(requireContext());
-        artworkFrame.setBackgroundResource(R.drawable.bg_art_tile);
-        ImageView fallbackArtwork = new ImageView(requireContext());
-        fallbackArtwork.setImageResource(R.drawable.ic_mic);
-        artworkFrame.addView(fallbackArtwork, new FrameLayout.LayoutParams(dp(30), dp(30),
-                android.view.Gravity.CENTER));
-        ImageView artwork = new ImageView(requireContext());
-        artwork.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        artwork.setContentDescription(ShowPreviewFormatter.showName(show) + " artwork");
-        artwork.setVisibility(View.GONE);
-        artworkFrame.addView(artwork, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(108)));
-        card.addView(artworkFrame, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(108)));
-
-        String imageUrl = show.getImageUrl() == null ? null : show.getImageUrl().trim();
-        String showName = ShowPreviewFormatter.showName(show);
-        boolean isAsimdumise = ASIMDUMISE_NAME.equalsIgnoreCase(showName.trim());
-        if (isAsimdumise) {
-            if (imageUrl == null || imageUrl.isEmpty()) {
-                Toast.makeText(artwork.getContext(), "ASIMDUMISE: URL MISSING", Toast.LENGTH_LONG)
-                        .show();
-            } else if (ASIMDUMISE_CLOUDINARY_URL.equals(imageUrl)) {
-                Toast.makeText(artwork.getContext(), "ASIMDUMISE: CLOUDINARY URL RECEIVED",
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(artwork.getContext(), "ASIMDUMISE: OLD URL RECEIVED",
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            Log.d(TAG, "Loading show artwork: show=" + showName + ", url=" + imageUrl);
-            Glide.with(this)
-                    .load(imageUrl)
-                    .centerCrop()
-                    .placeholder(new ColorDrawable(Color.TRANSPARENT))
-                    .error(new ColorDrawable(Color.TRANSPARENT))
-                    .listener(new RequestListener<Drawable>() {
-                        @Override public boolean onLoadFailed(@Nullable GlideException error,
-                                Object model, Target<Drawable> target, boolean isFirstResource) {
-                            artwork.setVisibility(View.GONE);
-                            fallbackArtwork.setVisibility(View.VISIBLE);
-                            Log.e(TAG, "Show artwork failed: show=" + showName + ", url=" + imageUrl,
-                                    error);
-                            if (isAsimdumise) {
-                                Toast.makeText(artwork.getContext(), "ASIMDUMISE ARTWORK FAILED",
-                                        Toast.LENGTH_LONG).show();
-                            }
-                            return false;
-                        }
-
-                        @Override public boolean onResourceReady(Drawable resource, Object model,
-                                Target<Drawable> target, DataSource dataSource,
-                                boolean isFirstResource) {
-                            fallbackArtwork.setVisibility(View.GONE);
-                            artwork.setVisibility(View.VISIBLE);
-                            Log.d(TAG, "Show artwork loaded: show=" + showName + ", url="
-                                    + imageUrl + ", source=" + dataSource);
-                            if (isAsimdumise) {
-                                Toast.makeText(artwork.getContext(), "ASIMDUMISE ARTWORK LOADED",
-                                        Toast.LENGTH_LONG).show();
-                            }
-                            return false;
-                        }
-                    })
-                    .into(artwork);
-        } else {
-            Log.w(TAG, "Show artwork URL missing: show=" + ShowPreviewFormatter.showName(show));
-        }
+        TextView label = new TextView(requireContext());
+        label.setText("PROGRAMME");
+        label.setTextColor(requireContext().getColor(R.color.kasie_accent));
+        label.setTextSize(10);
+        label.setLetterSpacing(0.1f);
+        label.setTypeface(android.graphics.Typeface.MONOSPACE);
+        card.addView(label);
 
         TextView name = new TextView(requireContext());
         name.setText(ShowPreviewFormatter.showName(show));
@@ -325,13 +248,13 @@ public class HomeFragment extends Fragment {
         name.setMaxLines(2);
         LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        nameParams.topMargin = dp(10);
+        nameParams.topMargin = dp(8);
         card.addView(name, nameParams);
 
         String presenter = ShowPreviewFormatter.presenterText(show);
         if (!presenter.isEmpty()) {
             TextView presenterView = new TextView(requireContext());
-            presenterView.setText(presenter);
+            presenterView.setText("PRESENTER\n" + presenter);
             presenterView.setTextColor(Color.LTGRAY);
             presenterView.setTextSize(12);
             LinearLayout.LayoutParams presenterParams = new LinearLayout.LayoutParams(
