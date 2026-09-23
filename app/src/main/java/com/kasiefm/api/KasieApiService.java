@@ -21,4 +21,7 @@ public interface KasieApiService {
 
     @GET("/api/shows")
     Call<List<RadioShow>> getShows();
+
+    @GET("/api/featured")
+    Call<List<FeaturedContent>> getFeatured();
 }

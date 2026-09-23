@@ -12,11 +12,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.kasiefm.api.FeaturedContent;
 import com.kasiefm.api.KasieApiService;
 import com.kasiefm.api.RadioShow;
 import com.kasiefm.api.RetrofitClient;
 import com.kasiefm.api.Show;
 import java.util.List;
+import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,8 +34,11 @@ public class HomeFragment extends Fragment {
     private LinearLayout scheduleList;
     private LinearLayout showsList;
     private TextView showsStatus;
+    private TextView featuredStatus, featuredType, featuredTitle, featuredSummary;
+    private View featuredCard;
     private Call<List<Show>> scheduleCall;
     private Call<List<RadioShow>> showsCall;
+    private Call<List<FeaturedContent>> featuredCall;
     private boolean hasScheduleResponse;
     private final ScheduleExpansionState scheduleExpansionState = new ScheduleExpansionState();
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
@@ -59,6 +64,12 @@ public class HomeFragment extends Fragment {
         showsList = view.findViewById(R.id.shows_list);
         showsStatus = view.findViewById(R.id.shows_status);
         loadShows();
+        featuredStatus = view.findViewById(R.id.featured_status);
+        featuredCard = view.findViewById(R.id.featured_card);
+        featuredType = view.findViewById(R.id.featured_type);
+        featuredTitle = view.findViewById(R.id.featured_title);
+        featuredSummary = view.findViewById(R.id.featured_summary);
+        loadFeatured();
     }
 
     @Override public void onResume() {
@@ -224,6 +235,79 @@ public class HomeFragment extends Fragment {
         showsStatus.setOnClickListener(v -> loadShows());
     }
 
+    private void loadFeatured() {
+        if (!isAdded() || getView() == null) return;
+        if (featuredCall != null) featuredCall.cancel();
+        renderFeaturedLoading();
+        featuredCall = RetrofitClient.getInstance().create(KasieApiService.class).getFeatured();
+        featuredCall.enqueue(new Callback<List<FeaturedContent>>() {
+            @Override public void onResponse(Call<List<FeaturedContent>> call,
+                                             Response<List<FeaturedContent>> response) {
+                if (!canRenderFeatured(call)) return;
+                featuredCall = null;
+                if (!response.isSuccessful() || response.body() == null) {
+                    renderFeaturedError();
+                    return;
+                }
+                FeaturedContent newest = firstFeatured(response.body());
+                if (newest == null) renderFeaturedEmpty();
+                else renderFeatured(newest);
+            }
+
+            @Override public void onFailure(Call<List<FeaturedContent>> call, Throwable error) {
+                if (!canRenderFeatured(call) || call.isCanceled()) return;
+                featuredCall = null;
+                renderFeaturedError();
+            }
+        });
+    }
+
+    private boolean canRenderFeatured(Call<List<FeaturedContent>> call) {
+        return call == featuredCall && isAdded() && getView() != null;
+    }
+
+    @Nullable private FeaturedContent firstFeatured(List<FeaturedContent> content) {
+        for (FeaturedContent item : content) if (item != null) return item;
+        return null;
+    }
+
+    private void renderFeaturedLoading() {
+        featuredCard.setVisibility(View.GONE);
+        featuredStatus.setText("Loading featured content...");
+        featuredStatus.setVisibility(View.VISIBLE);
+    }
+
+    private void renderFeatured(FeaturedContent content) {
+        featuredType.setText(readableType(content.getType()));
+        featuredTitle.setText(nonBlank(content.getTitle(), "Featured content"));
+        String summary = nonBlank(content.getSummary(), "");
+        featuredSummary.setText(summary);
+        featuredSummary.setVisibility(summary.isEmpty() ? View.GONE : View.VISIBLE);
+        featuredStatus.setVisibility(View.GONE);
+        featuredCard.setVisibility(View.VISIBLE);
+    }
+
+    private void renderFeaturedEmpty() {
+        featuredCard.setVisibility(View.GONE);
+        featuredStatus.setText("No featured content right now.");
+        featuredStatus.setVisibility(View.VISIBLE);
+    }
+
+    private void renderFeaturedError() {
+        featuredCard.setVisibility(View.GONE);
+        featuredStatus.setText("Featured content is unavailable right now.");
+        featuredStatus.setVisibility(View.VISIBLE);
+    }
+
+    private String readableType(String type) {
+        return nonBlank(type, "Featured").replace('_', ' ').toUpperCase(Locale.US);
+    }
+
+    private String nonBlank(String value, String fallback) {
+        if (value == null || value.trim().isEmpty()) return fallback;
+        return value.trim();
+    }
+
     private void addShowCard(RadioShow show) {
         LinearLayout card = new LinearLayout(requireContext());
         card.setOrientation(LinearLayout.VERTICAL);
@@ -308,9 +392,13 @@ public class HomeFragment extends Fragment {
         stopRefreshing();
         if (showsCall != null) showsCall.cancel();
         showsCall = null;
+        if (featuredCall != null) featuredCall.cancel();
+        featuredCall = null;
         showTitle = null; showTime = null; currentStatus = null; currentDot = null;
         currentBadge = null; scheduleList = null; scheduleContainer = null; fullScheduleAction = null;
         showsList = null; showsStatus = null;
+        featuredCard = null; featuredStatus = null; featuredType = null; featuredTitle = null;
+        featuredSummary = null;
         hasScheduleResponse = false;
         super.onDestroyView();
     }
