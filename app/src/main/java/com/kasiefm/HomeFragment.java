@@ -72,6 +72,11 @@ public class HomeFragment extends Fragment {
         renderScheduleExpansion();
         showsList = view.findViewById(R.id.shows_list);
         showsStatus = view.findViewById(R.id.shows_status);
+        view.findViewById(R.id.view_all_shows_action).setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openAllShows();
+            }
+        });
         loadShows();
         featuredStatus = view.findViewById(R.id.featured_status);
         featuredScroll = view.findViewById(R.id.featured_scroll);

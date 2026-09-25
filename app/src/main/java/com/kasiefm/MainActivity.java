@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment highlightsFragment;
     private PodcastFragment podcastsFragment;
     private Fragment connectFragment;
+    private AllShowsFragment allShowsFragment;
     private Fragment activeFragment;
 
     // MainActivity no longer owns an ExoPlayer or a stream URL constant - RadioService
@@ -172,6 +173,13 @@ public class MainActivity extends AppCompatActivity {
                 podcastsFragment = (PodcastFragment) restoredPodcasts;
             }
             connectFragment = getSupportFragmentManager().findFragmentByTag("connect");
+            Fragment restoredAllShows = getSupportFragmentManager().findFragmentByTag("all_shows");
+            if (restoredAllShows instanceof AllShowsFragment) {
+                allShowsFragment = (AllShowsFragment) restoredAllShows;
+                if (!allShowsFragment.isHidden()) {
+                    activeFragment = allShowsFragment;
+                }
+            }
         }
 
         bottomNavigation.setOnItemSelectedListener(item -> {
@@ -225,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.add(R.id.fragment_container, fragment, tag);
         }
         for (Fragment existing : new Fragment[]{homeFragment, featuredFragment, highlightsFragment,
-                podcastsFragment, connectFragment}) {
+                podcastsFragment, connectFragment, allShowsFragment}) {
             if (existing != null && existing != fragment && existing.isAdded()) {
                 transaction.hide(existing);
             }
@@ -233,6 +241,34 @@ public class MainActivity extends AppCompatActivity {
         transaction.show(fragment);
         transaction.commit();
         activeFragment = fragment;
+    }
+
+    /** Opens the Home-owned all-shows route without changing the selected bottom-nav tab. */
+    public void openAllShows() {
+        if (allShowsFragment == null) {
+            allShowsFragment = new AllShowsFragment();
+        }
+        if (activeFragment == allShowsFragment) {
+            return;
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (activeFragment != null && activeFragment.isAdded()) {
+            transaction.hide(activeFragment);
+        }
+        if (!allShowsFragment.isAdded()) {
+            transaction.add(R.id.fragment_container, allShowsFragment, "all_shows");
+        }
+        transaction.show(allShowsFragment).commit();
+        activeFragment = allShowsFragment;
+    }
+
+    /** Returns from the all-shows route to the already-cached Home fragment. */
+    public void returnHomeFromAllShows() {
+        if (homeFragment == null) {
+            homeFragment = new HomeFragment();
+        }
+        showFragment(homeFragment, "home");
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
     }
 
     /** Called before podcast playback starts so the app never plays two streams at once. */
