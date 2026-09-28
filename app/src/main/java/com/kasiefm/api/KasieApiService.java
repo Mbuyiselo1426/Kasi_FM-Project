@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface KasieApiService {
     @GET("/api/schedule")
@@ -21,6 +22,9 @@ public interface KasieApiService {
 
     @GET("/api/shows")
     Call<List<RadioShow>> getShows();
+
+    @GET("/api/shows/{id}")
+    Call<RadioShow> getShow(@Path("id") long id);
 
     @GET("/api/featured")
     Call<List<FeaturedContent>> getFeatured();

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingBottom="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/show_details_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:text="‹ ALL SHOWS"
+            android:textColor="@color/kasie_cyan"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/show_details_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Loading show..."
+            android:textColor="@color/kasie_text_secondary"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:id="@+id/show_details_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PROGRAMME"
+                android:textColor="@color/kasie_accent"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1" />
+
+            <TextView
+                android:id="@+id/show_details_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.Kasie.Display" />
+
+            <LinearLayout
+                android:id="@+id/show_details_presenter_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PRESENTER"
+                    android:textAppearance="@style/TextAppearance.Kasie.Section" />
+
+                <TextView
+                    android:id="@+id/show_details_presenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.Kasie.RowTitle" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/show_details_about_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ABOUT THE SHOW"
+                    android:textAppearance="@style/TextAppearance.Kasie.Section" />
+
+                <TextView
+                    android:id="@+id/show_details_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.Kasie.Meta"
+                    android:lineSpacingMultiplier="1.2" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/show_details_catch_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="CATCH UP →"
+                android:textColor="@color/kasie_cyan"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

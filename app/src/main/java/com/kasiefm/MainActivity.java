@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private PodcastFragment podcastsFragment;
     private Fragment connectFragment;
     private AllShowsFragment allShowsFragment;
+    private ShowDetailsFragment showDetailsFragment;
     private Fragment activeFragment;
 
     // MainActivity no longer owns an ExoPlayer or a stream URL constant - RadioService
@@ -180,6 +181,13 @@ public class MainActivity extends AppCompatActivity {
                     activeFragment = allShowsFragment;
                 }
             }
+            Fragment restoredShowDetails = getSupportFragmentManager().findFragmentByTag("show_details");
+            if (restoredShowDetails instanceof ShowDetailsFragment) {
+                showDetailsFragment = (ShowDetailsFragment) restoredShowDetails;
+                if (!showDetailsFragment.isHidden()) {
+                    activeFragment = showDetailsFragment;
+                }
+            }
         }
 
         bottomNavigation.setOnItemSelectedListener(item -> {
@@ -233,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             transaction.add(R.id.fragment_container, fragment, tag);
         }
         for (Fragment existing : new Fragment[]{homeFragment, featuredFragment, highlightsFragment,
-                podcastsFragment, connectFragment, allShowsFragment}) {
+                podcastsFragment, connectFragment, allShowsFragment, showDetailsFragment}) {
             if (existing != null && existing != fragment && existing.isAdded()) {
                 transaction.hide(existing);
             }
@@ -269,6 +277,35 @@ public class MainActivity extends AppCompatActivity {
         }
         showFragment(homeFragment, "home");
         bottomNavigation.setSelectedItemId(R.id.nav_home);
+    }
+
+    /** Opens details for one radio-show ID; the fragment fetches its own source data. */
+    public void openShowDetails(long showId) {
+        showDetailsFragment = ShowDetailsFragment.newInstance(showId);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (activeFragment != null && activeFragment.isAdded()) {
+            transaction.hide(activeFragment);
+        }
+        transaction.add(R.id.fragment_container, showDetailsFragment, "show_details");
+        transaction.show(showDetailsFragment).commit();
+        activeFragment = showDetailsFragment;
+    }
+
+    /** Returns from a transient show-details route to the already-loaded all-shows list. */
+    public void returnToAllShowsFromDetails() {
+        if (allShowsFragment == null) {
+            allShowsFragment = new AllShowsFragment();
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (showDetailsFragment != null && showDetailsFragment.isAdded()) {
+            transaction.remove(showDetailsFragment);
+        }
+        if (!allShowsFragment.isAdded()) {
+            transaction.add(R.id.fragment_container, allShowsFragment, "all_shows");
+        }
+        transaction.show(allShowsFragment).commit();
+        showDetailsFragment = null;
+        activeFragment = allShowsFragment;
     }
 
     /** Called before podcast playback starts so the app never plays two streams at once. */

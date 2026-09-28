@@ -156,6 +156,17 @@ public class AllShowsFragment extends Fragment {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         cardParams.bottomMargin = dp(12);
         showsList.addView(card, cardParams);
+
+        card.setClickable(true);
+        card.setFocusable(true);
+        card.setContentDescription("View " + ShowPreviewFormatter.showName(show));
+        card.setOnClickListener(v -> openShowDetails(show.getId()));
+    }
+
+    private void openShowDetails(long showId) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).openShowDetails(showId);
+        }
     }
 
     private int dp(int value) {
