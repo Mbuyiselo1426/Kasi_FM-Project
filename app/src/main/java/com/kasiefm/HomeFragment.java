@@ -3,6 +3,9 @@ package com.kasiefm;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.Manifest;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +33,9 @@ import com.kasiefm.api.KasieApiService;
 import com.kasiefm.api.RadioShow;
 import com.kasiefm.api.RetrofitClient;
 import com.kasiefm.api.Show;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import retrofit2.Call;
@@ -42,6 +48,7 @@ public class HomeFragment extends Fragment {
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private static final int SHOW_PREVIEW_COUNT = 4;
+    private static final int FEATURED_PREVIEW_COUNT = 3;
     private TextView showTitle, showTime, currentStatus;
     private TextView fullScheduleAction;
     private View currentDot, currentBadge, scheduleContainer;
@@ -297,7 +304,7 @@ public class HomeFragment extends Fragment {
         for (FeaturedContent item : content) {
             if (item == null) continue;
             addFeaturedCard(item);
-            rendered++;
+            if (++rendered == FEATURED_PREVIEW_COUNT) break;
         }
         if (rendered == 0) {
             renderFeaturedEmpty();
@@ -310,7 +317,7 @@ public class HomeFragment extends Fragment {
     private void renderFeaturedEmpty() {
         featuredList.removeAllViews();
         featuredScroll.setVisibility(View.GONE);
-        featuredStatus.setText("No featured content right now.");
+        featuredStatus.setText("No featured content available right now.");
         featuredStatus.setVisibility(View.VISIBLE);
     }
 
@@ -356,7 +363,7 @@ public class HomeFragment extends Fragment {
         details.setPadding(dp(14), dp(12), dp(14), dp(14));
 
         TextView type = new TextView(requireContext());
-        type.setText(readableType(content.getType()));
+        type.setText(readableFeaturedType(content.getType()));
         type.setTextColor(requireContext().getColor(R.color.kasie_accent));
         type.setTextSize(10);
         type.setLetterSpacing(0.1f);
@@ -386,15 +393,34 @@ public class HomeFragment extends Fragment {
             details.addView(summary, summaryParams);
         }
 
-        TextView action = new TextView(requireContext());
-        action.setText(featuredAction(content.getType()));
-        action.setTextColor(requireContext().getColor(R.color.kasie_accent));
-        action.setTextSize(11);
-        action.setTypeface(android.graphics.Typeface.MONOSPACE);
-        LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        actionParams.topMargin = dp(12);
-        details.addView(action, actionParams);
+        String publishedDate = formatFeaturedDate(content.getPublishedAt());
+        if (!publishedDate.isEmpty()) {
+            TextView date = new TextView(requireContext());
+            date.setText(publishedDate);
+            date.setTextColor(requireContext().getColor(R.color.kasie_text_muted));
+            date.setTextSize(11);
+            date.setTypeface(android.graphics.Typeface.MONOSPACE);
+            LinearLayout.LayoutParams dateParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dateParams.topMargin = dp(12);
+            details.addView(date, dateParams);
+        }
+
+        String externalUrl = nonBlank(content.getExternalUrl(), "");
+        if (!externalUrl.isEmpty()) {
+            TextView action = new TextView(requireContext());
+            action.setText("READ MORE →");
+            action.setTextColor(requireContext().getColor(R.color.kasie_accent));
+            action.setTextSize(11);
+            action.setTypeface(android.graphics.Typeface.MONOSPACE);
+            action.setClickable(true);
+            action.setContentDescription("Read more: " + nonBlank(content.getTitle(), "Featured content"));
+            action.setOnClickListener(v -> openFeaturedLink(externalUrl));
+            LinearLayout.LayoutParams actionParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            actionParams.topMargin = dp(12);
+            details.addView(action, actionParams);
+        }
 
         card.addView(details, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -426,19 +452,60 @@ public class HomeFragment extends Fragment {
                 .into(image);
     }
 
-    private String readableType(String type) {
-        return nonBlank(type, "Featured").replace('_', ' ').toUpperCase(Locale.US);
-    }
-
-    private String featuredAction(String type) {
+    static String readableFeaturedType(String type) {
         String normalizedType = nonBlank(type, "").toUpperCase(Locale.US);
-        if ("EVENT".equals(normalizedType)) return "DETAILS →";
-        if ("FEATURED_SHOW".equals(normalizedType)) return "VIEW SHOW →";
-        return "READ →";
+        switch (normalizedType) {
+            case "COMMUNITY_NEWS": return "Community News";
+            case "ANNOUNCEMENT": return "Announcement";
+            case "EVENT": return "Event";
+            case "INTERVIEW": return "Interview";
+            case "FEATURED_SHOW": return "Featured Show";
+            default: return "Featured";
+        }
     }
 
-    private String nonBlank(String value, String fallback) {
-        if (value == null || value.trim().isEmpty()) return fallback;
+    private void openFeaturedLink(String externalUrl) {
+        Uri uri;
+        try {
+            uri = Uri.parse(externalUrl);
+        } catch (Exception error) {
+            showFeaturedLinkError();
+            return;
+        }
+        String scheme = uri.getScheme();
+        if (scheme == null || uri.getHost() == null
+                || !("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme))) {
+            showFeaturedLinkError();
+            return;
+        }
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        } catch (ActivityNotFoundException error) {
+            if (isAdded()) Toast.makeText(requireContext(), "No app is available to open this link.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showFeaturedLinkError() {
+        if (isAdded()) Toast.makeText(requireContext(), "This link is unavailable.",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    static String formatFeaturedDate(String value) {
+        String dateValue = nonBlank(value, "");
+        if (dateValue.length() < 10) return "";
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                    .parse(dateValue.substring(0, 10));
+            return date == null ? "" : new SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+                    .format(date);
+        } catch (ParseException error) {
+            return "";
+        }
+    }
+
+    static String nonBlank(String value, String fallback) {
+        if (value == null || value.trim().isEmpty() || "null".equalsIgnoreCase(value.trim())) return fallback;
         return value.trim();
     }
 

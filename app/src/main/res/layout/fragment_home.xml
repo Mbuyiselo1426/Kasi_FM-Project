@@ -129,13 +129,6 @@
             android:text="FEATURED"
             android:textAppearance="@style/TextAppearance.Kasie.Section" />
 
-        <TextView
-            android:id="@+id/view_all_featured_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="View All ›"
-            android:textColor="@color/kasie_cyan"
-            android:textSize="12sp" />
     </LinearLayout>
 
     <TextView
