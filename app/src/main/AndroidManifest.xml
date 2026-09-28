@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -23,6 +24,11 @@
 
         <service
             android:name=".RadioService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".ShowReminderReceiver"
             android:enabled="true"
             android:exported="false" />
 

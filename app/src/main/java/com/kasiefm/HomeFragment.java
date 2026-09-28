@@ -2,6 +2,9 @@ package com.kasiefm;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -33,6 +38,7 @@ import retrofit2.Response;
 
 /** Home schedule UI. The API's isCurrent flag is the sole current-show authority. */
 public class HomeFragment extends Fragment {
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 401;
     private static final long REFRESH_GRACE_MILLIS = 8_000L;
     private static final long REFRESH_RETRY_MILLIS = 60_000L;
     private static final int SHOW_PREVIEW_COUNT = 4;
@@ -49,6 +55,8 @@ public class HomeFragment extends Fragment {
     private Call<List<RadioShow>> showsCall;
     private Call<List<FeaturedContent>> featuredCall;
     private boolean hasScheduleResponse;
+    private Show pendingReminderShow;
+    private ImageButton pendingReminderButton;
     private final ScheduleExpansionState scheduleExpansionState = new ScheduleExpansionState();
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
     private final Runnable refreshRunnable = () -> loadSchedule(false);
@@ -508,11 +516,87 @@ public class HomeFragment extends Fragment {
     }
     private void addScheduleRow(Show show) {
         if (show == null) return;
-        TextView row = new TextView(requireContext());
-        row.setText(formatTime(show) + "\n" + safeName(show)); row.setTextColor(Color.WHITE);
-        row.setTextSize(14); row.setPadding(15, 15, 15, 15);
+        LinearLayout row = new LinearLayout(requireContext());
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(dp(15), dp(8), dp(8), dp(8));
         if (show.isCurrent()) row.setBackgroundResource(R.drawable.bg_schedule_now);
+
+        TextView scheduleText = new TextView(requireContext());
+        scheduleText.setText(formatTime(show) + "\n" + safeName(show));
+        scheduleText.setTextColor(Color.WHITE);
+        scheduleText.setTextSize(14);
+        row.addView(scheduleText, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        ImageButton reminderButton = new ImageButton(requireContext());
+        reminderButton.setMinimumWidth(dp(48));
+        reminderButton.setMinimumHeight(dp(48));
+        reminderButton.setContentDescription("Set reminder for " + safeName(show));
+        reminderButton.setBackgroundColor(Color.TRANSPARENT);
+        row.addView(reminderButton, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        renderReminderBell(reminderButton, show);
+        reminderButton.setOnClickListener(v -> onReminderClicked(show, reminderButton));
+
         scheduleList.addView(row);
+    }
+
+    private void onReminderClicked(Show show, ImageButton button) {
+        ShowReminderScheduler scheduler = new ShowReminderScheduler(requireContext());
+        if (scheduler.isReminderSet(show)) {
+            scheduler.cancel(show);
+            renderReminderBell(button, show);
+            Toast.makeText(requireContext(), "Show reminder cancelled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (ShowReminderTime.calculateTriggerMillis(show, System.currentTimeMillis()) < 0L) {
+            Toast.makeText(requireContext(), "This airing can no longer be reminded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && requireContext().checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            pendingReminderShow = show;
+            pendingReminderButton = button;
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_NOTIFICATION_PERMISSION);
+            return;
+        }
+        scheduleReminder(show, button);
+    }
+
+    private void scheduleReminder(Show show, ImageButton button) {
+        ShowReminderScheduler scheduler = new ShowReminderScheduler(requireContext());
+        if (!scheduler.schedule(show, System.currentTimeMillis())) {
+            Toast.makeText(requireContext(), "This airing can no longer be reminded.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        renderReminderBell(button, show);
+        Toast.makeText(requireContext(), "Show reminder set for 5 minutes before", Toast.LENGTH_SHORT).show();
+    }
+
+    private void renderReminderBell(ImageButton button, Show show) {
+        boolean set = new ShowReminderScheduler(requireContext()).isReminderSet(show);
+        button.setImageResource(set ? R.drawable.ic_reminder_set : R.drawable.ic_reminder_bell);
+        button.setColorFilter(requireContext().getColor(set ? R.color.kasie_accent : R.color.kasie_cyan));
+        button.setContentDescription((set ? "Cancel reminder for " : "Set reminder for ")
+                + safeName(show));
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQUEST_NOTIFICATION_PERMISSION) return;
+        boolean granted = grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+        if (granted && pendingReminderShow != null && pendingReminderButton != null) {
+            scheduleReminder(pendingReminderShow, pendingReminderButton);
+        } else if (!granted && isAdded()) {
+            Toast.makeText(requireContext(), "Notification permission is needed for show reminders.",
+                    Toast.LENGTH_SHORT).show();
+        }
+        pendingReminderShow = null;
+        pendingReminderButton = null;
     }
     @Override public void onDestroyView() {
         stopRefreshing();
@@ -524,6 +608,7 @@ public class HomeFragment extends Fragment {
         currentBadge = null; scheduleList = null; scheduleContainer = null; fullScheduleAction = null;
         showsList = null; showsStatus = null;
         featuredStatus = null; featuredScroll = null; featuredList = null;
+        pendingReminderShow = null; pendingReminderButton = null;
         hasScheduleResponse = false;
         super.onDestroyView();
     }
