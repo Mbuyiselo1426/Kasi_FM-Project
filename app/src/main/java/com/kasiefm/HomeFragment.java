@@ -431,6 +431,10 @@ public class HomeFragment extends Fragment {
     private void loadFeaturedImage(String imageUrl, ImageView image, TextView fallback) {
         String url = nonBlank(imageUrl, "");
         if (url.isEmpty()) return;
+        // A GONE target is not measured, so Glide cannot determine the size of this
+        // dynamically-created artwork view. It has no drawable yet, leaving the
+        // fallback visible underneath until the request succeeds or fails.
+        image.setVisibility(View.VISIBLE);
         Glide.with(this)
                 .load(url)
                 .centerCrop()
