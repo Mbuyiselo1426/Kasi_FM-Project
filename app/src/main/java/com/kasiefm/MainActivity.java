@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigation;
     private TextView liveBadge;
 
+    private String communityShowTitle = "Kasie FM Live";
+    private String communityShowTime = "";
+
     /** Called by Home after the API has selected its isCurrent show. */
     public void renderScheduleHero(@Nullable Show currentShow, @NonNull String fallbackTitle,
                                    @NonNull String fallbackTime) {
@@ -42,12 +45,16 @@ public class MainActivity extends AppCompatActivity {
         if (currentShow == null) {
             heroTitle.setText(fallbackTitle);
             heroTime.setText(fallbackTime);
+            updateCommunityShow("Kasie FM Live", "");
             return;
         }
-        heroTitle.setText(currentShow.getName() == null ? "Current show" : currentShow.getName());
+        String showName = currentShow.getName() == null ? "Current show" : currentShow.getName();
         String start = currentShow.getStartTime() == null ? "" : currentShow.getStartTime();
         String end = currentShow.getEndTime() == null ? "" : currentShow.getEndTime();
-        heroTime.setText(start + " - " + end);
+        String showTime = start + " - " + end;
+        heroTitle.setText(showName);
+        heroTime.setText(showTime);
+        updateCommunityShow(currentShow.getName() == null ? "Kasie FM Live" : showName, showTime);
     }
 
     // Cached so switching tabs doesn't re-fetch the schedule or rebuild the
@@ -57,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private Fragment featuredFragment;
     private Fragment highlightsFragment;
     private PodcastFragment podcastsFragment;
-    private Fragment connectFragment;
+    private ConnectFragment connectFragment;
     private AllShowsFragment allShowsFragment;
     private ShowDetailsFragment showDetailsFragment;
     private Fragment activeFragment;
@@ -181,7 +188,10 @@ public class MainActivity extends AppCompatActivity {
             if (restoredPodcasts instanceof PodcastFragment) {
                 podcastsFragment = (PodcastFragment) restoredPodcasts;
             }
-            connectFragment = getSupportFragmentManager().findFragmentByTag("connect");
+            Fragment restoredConnect = getSupportFragmentManager().findFragmentByTag("connect");
+            if (restoredConnect instanceof ConnectFragment) {
+                connectFragment = (ConnectFragment) restoredConnect;
+            }
             Fragment restoredAllShows = getSupportFragmentManager().findFragmentByTag("all_shows");
             if (restoredAllShows instanceof AllShowsFragment) {
                 allShowsFragment = (AllShowsFragment) restoredAllShows;
@@ -338,6 +348,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Uses the existing RadioService player for Community's compact control. */
+    public void toggleLiveRadioFromCommunity() {
+        if (!serviceBound || radioService == null) {
+            return;
+        }
+        if (radioService.isPlaying()) {
+            radioService.pause();
+        } else {
+            pausePodcastPlayback();
+            radioService.play();
+        }
+    }
+
+    public String getCommunityShowTitle() {
+        return communityShowTitle;
+    }
+
+    public String getCommunityShowTime() {
+        return communityShowTime;
+    }
+
+    private void updateCommunityShow(String title, String time) {
+        communityShowTitle = title == null || title.trim().isEmpty() ? "Kasie FM Live" : title;
+        communityShowTime = time == null ? "" : time;
+        if (connectFragment != null) {
+            connectFragment.renderLiveMiniPlayer(communityShowTitle, communityShowTime,
+                    getPlaybackStateForTesting());
+        }
+    }
+
+    private void updateCommunityPlaybackState(String state) {
+        if (connectFragment != null) {
+            connectFragment.renderLiveMiniPlayer(communityShowTitle, communityShowTime, state);
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -387,8 +433,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case "ERROR":
                 showPlaybackError();
-                break;
+                return;
         }
+        updateCommunityPlaybackState(state);
     }
 
     private void showPlaybackError() {
@@ -401,5 +448,6 @@ public class MainActivity extends AppCompatActivity {
         }
         titleText.setText(getString(R.string.network_error_message));
         artistText.setText("Tap to retry");
+        updateCommunityPlaybackState("ERROR");
     }
 }

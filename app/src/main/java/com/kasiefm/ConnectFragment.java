@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
@@ -55,6 +56,16 @@ public class ConnectFragment extends Fragment {
     private TextInputEditText messageInput;
     private TextInputLayout messageInputLayout;
     private MaterialButton sendButton;
+    private TextView liveStatus;
+    private TextView liveShowTitle;
+    private TextView liveShowTime;
+    private MaterialButton livePlayButton;
+    private TextView messageStudioTab;
+    private TextView groupChatsTab;
+    private View messageStudioIndicator;
+    private View groupChatsIndicator;
+    private View messageStudioContainer;
+    private View groupChatsContainer;
     private Call<MessageResponse> messageCall;
 
     @Nullable
@@ -77,6 +88,16 @@ public class ConnectFragment extends Fragment {
         artistInput = view.findViewById(R.id.artist_input);
         messageInput = view.findViewById(R.id.message_input);
         messageInputLayout = view.findViewById(R.id.message_input_layout);
+        liveStatus = view.findViewById(R.id.community_live_status);
+        liveShowTitle = view.findViewById(R.id.community_live_show_title);
+        liveShowTime = view.findViewById(R.id.community_live_show_time);
+        livePlayButton = view.findViewById(R.id.community_live_play_button);
+        messageStudioTab = view.findViewById(R.id.message_studio_tab);
+        groupChatsTab = view.findViewById(R.id.group_chats_tab);
+        messageStudioIndicator = view.findViewById(R.id.message_studio_indicator);
+        groupChatsIndicator = view.findViewById(R.id.group_chats_indicator);
+        messageStudioContainer = view.findViewById(R.id.message_studio_container);
+        groupChatsContainer = view.findViewById(R.id.group_chats_container);
 
         sendButton = view.findViewById(R.id.send_whatsapp_button);
         MaterialButton smsButton = view.findViewById(R.id.sms_button);
@@ -101,6 +122,82 @@ public class ConnectFragment extends Fragment {
         });
 
         callButton.setOnClickListener(v -> callStudio());
+
+        livePlayButton.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).toggleLiveRadioFromCommunity();
+            }
+        });
+        messageStudioTab.setOnClickListener(v -> selectCommunityTab(true));
+        groupChatsTab.setOnClickListener(v -> selectCommunityTab(false));
+        View.OnClickListener comingSoon = v -> Toast.makeText(requireContext(),
+                "Group chats coming soon", Toast.LENGTH_SHORT).show();
+        view.findViewById(R.id.live_show_chat_card).setOnClickListener(comingSoon);
+        view.findViewById(R.id.community_lounge_card).setOnClickListener(comingSoon);
+        view.findViewById(R.id.local_events_card).setOnClickListener(comingSoon);
+        selectCommunityTab(true);
+        syncLiveMiniPlayer();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        syncLiveMiniPlayer();
+    }
+
+    @Override public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) syncLiveMiniPlayer();
+    }
+
+    /** Receives display state from MainActivity; never owns a player. */
+    public void renderLiveMiniPlayer(String title, String time, @Nullable String playbackState) {
+        if (liveShowTitle == null) return;
+        liveShowTitle.setText(TextUtils.isEmpty(title) ? "Kasie FM Live" : title);
+        liveShowTime.setText(time == null ? "" : time);
+        liveShowTime.setVisibility(TextUtils.isEmpty(time) ? View.GONE : View.VISIBLE);
+        String state = playbackState == null ? "PAUSED" : playbackState;
+        if ("LIVE".equals(state)) {
+            liveStatus.setText("● LIVE");
+            livePlayButton.setEnabled(true);
+            livePlayButton.setText("Ⅱ");
+            livePlayButton.setContentDescription("Pause live radio");
+        } else if ("BUFFERING".equals(state)) {
+            liveStatus.setText("● BUFFERING");
+            livePlayButton.setEnabled(false);
+            livePlayButton.setText("…");
+            livePlayButton.setContentDescription("Live radio is buffering");
+        } else if ("ERROR".equals(state)) {
+            liveStatus.setText("● OFFLINE");
+            livePlayButton.setEnabled(true);
+            livePlayButton.setText("▶");
+            livePlayButton.setContentDescription("Retry live radio");
+        } else {
+            liveStatus.setText("● PAUSED");
+            livePlayButton.setEnabled(true);
+            livePlayButton.setText("▶");
+            livePlayButton.setContentDescription("Play live radio");
+        }
+    }
+
+    private void syncLiveMiniPlayer() {
+        if (getActivity() instanceof MainActivity) {
+            MainActivity activity = (MainActivity) getActivity();
+            renderLiveMiniPlayer(activity.getCommunityShowTitle(), activity.getCommunityShowTime(),
+                    activity.getPlaybackStateForTesting());
+        }
+    }
+
+    private void selectCommunityTab(boolean messageStudioSelected) {
+        messageStudioContainer.setVisibility(messageStudioSelected ? View.VISIBLE : View.GONE);
+        groupChatsContainer.setVisibility(messageStudioSelected ? View.GONE : View.VISIBLE);
+        messageStudioTab.setTextColor(ContextCompat.getColor(requireContext(),
+                messageStudioSelected ? R.color.kasie_accent : R.color.kasie_text_muted));
+        groupChatsTab.setTextColor(ContextCompat.getColor(requireContext(),
+                messageStudioSelected ? R.color.kasie_text_muted : R.color.kasie_accent));
+        messageStudioIndicator.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                messageStudioSelected ? R.color.kasie_accent : R.color.kasie_outline));
+        groupChatsIndicator.setBackgroundColor(ContextCompat.getColor(requireContext(),
+                messageStudioSelected ? R.color.kasie_outline : R.color.kasie_accent));
     }
 
     private boolean isSongRequestSelected() {
