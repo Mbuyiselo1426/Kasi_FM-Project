@@ -332,8 +332,7 @@ public class HomeFragment extends Fragment {
         LinearLayout card = new LinearLayout(requireContext());
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackgroundResource(R.drawable.bg_dark_card);
-        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(220),
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(220), dp(320));
         cardParams.setMarginEnd(dp(12));
 
         FrameLayout imageArea = new FrameLayout(requireContext());
@@ -425,7 +424,7 @@ public class HomeFragment extends Fragment {
         }
 
         card.addView(details, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
         loadFeaturedImage(content.getImageUrl(), image, fallback);
         featuredList.addView(card, cardParams);
     }
@@ -519,10 +518,8 @@ public class HomeFragment extends Fragment {
         LinearLayout card = new LinearLayout(requireContext());
         card.setOrientation(LinearLayout.VERTICAL);
         card.setBackgroundResource(R.drawable.bg_dark_card);
-        card.setPadding(dp(14), dp(14), dp(14), dp(14));
-        card.setMinimumHeight(dp(128));
-        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(180),
-                ViewGroup.LayoutParams.WRAP_CONTENT);
+        card.setPadding(dp(16), dp(16), dp(16), dp(16));
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(180), dp(140));
         cardParams.setMarginEnd(dp(12));
 
         TextView label = new TextView(requireContext());
@@ -546,12 +543,14 @@ public class HomeFragment extends Fragment {
         String presenter = ShowPreviewFormatter.presenterText(show);
         if (!presenter.isEmpty()) {
             TextView presenterView = new TextView(requireContext());
-            presenterView.setText("PRESENTER\n" + presenter);
+            presenterView.setText("PRESENTER · " + presenter);
             presenterView.setTextColor(Color.LTGRAY);
             presenterView.setTextSize(12);
+            presenterView.setMaxLines(1);
+            presenterView.setEllipsize(android.text.TextUtils.TruncateAt.END);
             LinearLayout.LayoutParams presenterParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            presenterParams.topMargin = dp(4);
+            presenterParams.topMargin = dp(8);
             card.addView(presenterView, presenterParams);
         }
         showsList.addView(card, cardParams);
