@@ -14,6 +14,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -31,11 +33,15 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload APK as build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Create prerelease and upload APK
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "kasie-fm-test-build-${GITHUB_RUN_NUMBER}" \
+            app/build/outputs/apk/debug/app-debug.apk \
+            --prerelease \
+            --title "Kasie FM Test Build ${GITHUB_RUN_NUMBER}" \
+            --generate-notes
 
   instrumented-tests:
     runs-on: ubuntu-latest
