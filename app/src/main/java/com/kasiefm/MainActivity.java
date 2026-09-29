@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.HapticFeedbackConstants;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -145,6 +148,11 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
 
+        findViewById(R.id.btn_call_studio).setOnClickListener(v -> {
+            v.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
+            openStudioDialer();
+        });
+
         playPauseButton.setOnClickListener(v -> {
             if (!serviceBound || radioService == null) {
                 return; // service hasn't bound yet - button briefly no-ops rather than crashing
@@ -222,6 +230,15 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         });
+    }
+
+    private void openStudioDialer() {
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:+27102360002"));
+        if (dialIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(dialIntent);
+        } else {
+            Toast.makeText(this, "Unable to open phone dialer", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**

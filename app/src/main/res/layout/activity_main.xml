@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@color/kasie_background">
 
-    <!-- Toolbar: logo + wordmark + search/bell -->
+    <!-- Toolbar: logo + wordmark + search/call studio -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -62,12 +62,12 @@
                 android:src="@drawable/ic_search" />
 
             <ImageView
-                android:id="@+id/btn_notifications"
+                android:id="@+id/btn_call_studio"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:padding="9dp"
-                android:contentDescription="Notifications"
-                android:src="@drawable/ic_bell" />
+                android:contentDescription="Call Kasie FM studio"
+                android:src="@drawable/ic_phone" />
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 

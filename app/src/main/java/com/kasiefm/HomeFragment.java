@@ -374,6 +374,7 @@ public class HomeFragment extends Fragment {
         title.setText(nonBlank(content.getTitle(), "Featured content"));
         title.setTextAppearance(R.style.TextAppearance_Kasie_CardTitle);
         title.setMaxLines(2);
+        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
         LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         titleParams.topMargin = dp(6);
@@ -387,6 +388,7 @@ public class HomeFragment extends Fragment {
             summary.setTextSize(12);
             summary.setLineSpacing(0f, 1.2f);
             summary.setMaxLines(3);
+            summary.setEllipsize(android.text.TextUtils.TruncateAt.END);
             LinearLayout.LayoutParams summaryParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             summaryParams.topMargin = dp(8);
@@ -535,6 +537,7 @@ public class HomeFragment extends Fragment {
         name.setText(ShowPreviewFormatter.showName(show));
         name.setTextAppearance(R.style.TextAppearance_Kasie_RowTitle);
         name.setMaxLines(2);
+        name.setEllipsize(android.text.TextUtils.TruncateAt.END);
         LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         nameParams.topMargin = dp(8);
