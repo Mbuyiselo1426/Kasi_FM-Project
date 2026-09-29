@@ -61,7 +61,7 @@ public class PodcastFragment extends Fragment {
                 if (!canRender(call)) return;
                 podcastsCall = null;
                 if (!response.isSuccessful() || response.body() == null) {
-                    renderError("Podcasts are unavailable right now. Please try again later.");
+                    renderError();
                     return;
                 }
                 renderEpisodes(response.body());
@@ -71,7 +71,7 @@ public class PodcastFragment extends Fragment {
                     @NonNull Throwable error) {
                 if (!canRender(call) || call.isCanceled()) return;
                 podcastsCall = null;
-                renderError("Unable to load podcasts. Check your connection and try again.");
+                renderError();
             }
         });
     }
@@ -83,7 +83,8 @@ public class PodcastFragment extends Fragment {
     private void renderEpisodes(List<PodcastEpisode> episodes) {
         list.removeAllViews();
         if (episodes.isEmpty()) {
-            status.setText("No catch up episodes are available yet.");
+            status.setVisibility(View.VISIBLE);
+            status.setText("No podcasts available right now.");
             return;
         }
         status.setVisibility(View.GONE);
@@ -92,10 +93,10 @@ public class PodcastFragment extends Fragment {
         }
     }
 
-    private void renderError(String message) {
+    private void renderError() {
         list.removeAllViews();
         status.setVisibility(View.VISIBLE);
-        status.setText(message);
+        status.setText("Podcasts are unavailable right now.");
     }
 
     private void addEpisode(PodcastEpisode episode) {
@@ -108,29 +109,73 @@ public class PodcastFragment extends Fragment {
         cardParams.bottomMargin = dp(10);
         list.addView(card, cardParams);
 
+        TextView label = new TextView(requireContext());
+        label.setText("PODCAST");
+        label.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_accent));
+        label.setTextSize(11);
+        label.setTypeface(android.graphics.Typeface.MONOSPACE);
+        label.setLetterSpacing(0.08f);
+        card.addView(label);
+
         TextView title = new TextView(requireContext());
         title.setText(nonEmpty(episode.getTitle(), "Untitled episode"));
         title.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_text_primary));
         title.setTextSize(17);
         title.setTypeface(null, android.graphics.Typeface.BOLD);
-        card.addView(title);
+        title.setMaxLines(2);
+        title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        titleParams.topMargin = dp(6);
+        card.addView(title, titleParams);
 
         TextView showName = new TextView(requireContext());
         showName.setText(nonEmpty(episode.getShowName(), "Kasie FM"));
         showName.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_text_secondary));
         showName.setTextSize(14);
+        showName.setMaxLines(1);
+        showName.setEllipsize(android.text.TextUtils.TruncateAt.END);
         LinearLayout.LayoutParams showParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         showParams.topMargin = dp(5);
         card.addView(showName, showParams);
 
+        String description = blankToEmpty(episode.getDescription());
+        if (!description.isEmpty()) {
+            TextView descriptionView = new TextView(requireContext());
+            descriptionView.setText(description);
+            descriptionView.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_text_muted));
+            descriptionView.setTextSize(13);
+            descriptionView.setMaxLines(3);
+            descriptionView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams descriptionParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            descriptionParams.topMargin = dp(10);
+            card.addView(descriptionView, descriptionParams);
+        }
+
+        String publishedAt = blankToEmpty(episode.getPublishedAt());
+        if (!publishedAt.isEmpty()) {
+            TextView date = new TextView(requireContext());
+            date.setText("PUBLISHED  •  " + publishedAt);
+            date.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_text_muted));
+            date.setTextSize(11);
+            date.setTypeface(android.graphics.Typeface.MONOSPACE);
+            date.setMaxLines(1);
+            date.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams dateParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            dateParams.topMargin = dp(10);
+            card.addView(date, dateParams);
+        }
+
         Button playButton = new Button(requireContext());
         playButton.setAllCaps(false);
-        playButton.setText("Play");
+        playButton.setText("▶  PLAY EPISODE");
         playButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.kasie_text_on_accent));
         playButton.setBackgroundResource(R.drawable.bg_onair_pill);
         playButton.setContentDescription("Play " + nonEmpty(episode.getTitle(), "podcast episode"));
-        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(dp(96), dp(44));
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(dp(168), dp(44));
         buttonParams.topMargin = dp(12);
         buttonParams.gravity = Gravity.START;
         card.addView(playButton, buttonParams);
@@ -169,19 +214,20 @@ public class PodcastFragment extends Fragment {
         }
         player.play();
         if (selectedPlayButton != null) {
-            selectedPlayButton.setText("Pause");
-            selectedPlayButton.setContentDescription("Pause " + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+            if (player.getPlaybackState() == Player.STATE_READY) {
+                showPauseState();
+                status.setVisibility(View.GONE);
+            } else {
+                showLoadingState();
+            }
         }
-        status.setVisibility(View.VISIBLE);
-        status.setText("Loading episode...");
     }
 
     /** Called by MainActivity immediately before live radio begins. */
     public void pausePlayback() {
         if (player != null && player.getPlayWhenReady()) player.pause();
         if (selectedPlayButton != null && selectedEpisode != null) {
-            selectedPlayButton.setText("Play");
-            selectedPlayButton.setContentDescription("Play " + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+            showPlayState();
         }
         if (selectedEpisode != null && status != null) {
             status.setVisibility(View.VISIBLE);
@@ -197,9 +243,11 @@ public class PodcastFragment extends Fragment {
                 if (status == null) return;
                 if (playbackState == Player.STATE_BUFFERING) {
                     status.setVisibility(View.VISIBLE);
-                    status.setText("Loading episode...");
+                    status.setText("Buffering episode...");
+                    if (selectedPlayButton != null && selectedEpisode != null) showBufferingState();
                 } else if (playbackState == Player.STATE_READY && player.getPlayWhenReady()) {
                     status.setVisibility(View.GONE);
+                    showPauseState();
                 } else if (playbackState == Player.STATE_ENDED) {
                     resetSelectedButton();
                     status.setVisibility(View.VISIBLE);
@@ -219,9 +267,34 @@ public class PodcastFragment extends Fragment {
 
     private void resetSelectedButton() {
         if (selectedPlayButton != null && selectedEpisode != null) {
-            selectedPlayButton.setText("Play");
-            selectedPlayButton.setContentDescription("Play " + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+            showPlayState();
         }
+    }
+
+    private void showPlayState() {
+        selectedPlayButton.setText("▶  PLAY EPISODE");
+        selectedPlayButton.setContentDescription("Play "
+                + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+    }
+
+    private void showLoadingState() {
+        selectedPlayButton.setText("LOADING...");
+        selectedPlayButton.setContentDescription("Loading "
+                + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+        status.setVisibility(View.VISIBLE);
+        status.setText("Loading episode...");
+    }
+
+    private void showPauseState() {
+        selectedPlayButton.setText("Ⅱ  PAUSE");
+        selectedPlayButton.setContentDescription("Pause "
+                + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
+    }
+
+    private void showBufferingState() {
+        selectedPlayButton.setText("BUFFERING...");
+        selectedPlayButton.setContentDescription("Buffering "
+                + nonEmpty(selectedEpisode.getTitle(), "podcast episode"));
     }
 
     private boolean hasPlayableUrl(PodcastEpisode episode) {
@@ -234,6 +307,10 @@ public class PodcastFragment extends Fragment {
 
     private String nonEmpty(String value, String fallback) {
         return value == null || value.trim().isEmpty() ? fallback : value;
+    }
+
+    private String blankToEmpty(String value) {
+        return value == null ? "" : value.trim();
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
 

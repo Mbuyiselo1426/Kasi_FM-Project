@@ -16,20 +16,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="monospace"
-        android:letterSpacing="0.08"
-        android:text="CATCH UP"
-        android:textColor="@color/kasie_accent"
-        android:textSize="12sp" />
+        android:text="KASIE FM PODCASTS"
+        android:textAppearance="@style/TextAppearance.Kasie.Section"
+        android:textColor="@color/kasie_accent" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Podcasts"
-        android:textColor="@color/kasie_text_primary"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:text="On-demand conversations, interviews and special features."
+        android:textColor="@color/kasie_text_secondary"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/podcast_status"
