@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="@color/kasie_background">
 
-    <!-- Toolbar: logo + wordmark + search/call studio -->
+    <!-- Toolbar: logo + wordmark + call studio -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -52,14 +52,6 @@
                     android:textColor="@color/kasie_text_muted"
                     android:textSize="11sp" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/btn_search"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="9dp"
-                android:contentDescription="Search"
-                android:src="@drawable/ic_search" />
 
             <ImageView
                 android:id="@+id/btn_call_studio"
