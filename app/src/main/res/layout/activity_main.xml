@@ -70,6 +70,7 @@
 
     <!-- ===== LIVE HERO (yellow) — keeps player-bound IDs ===== -->
     <LinearLayout
+                android:id="@+id/home_live_hero"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

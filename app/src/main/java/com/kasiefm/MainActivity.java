@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.HapticFeedbackConstants;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView artistText;
     private BottomNavigationView bottomNavigation;
     private TextView liveBadge;
+    private View homeLiveHero;
 
     private String communityShowTitle = "Kasie FM Live";
     private String communityShowTime = "";
@@ -152,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
         titleText = findViewById(R.id.title_text);
         artistText = findViewById(R.id.artist_text);
         liveBadge = findViewById(R.id.live_badge);
+        homeLiveHero = findViewById(R.id.home_live_hero);
 
         bottomNavigation = findViewById(R.id.bottom_navigation);
 
@@ -208,6 +211,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // A recreated Activity can restore Community as the visible fragment before
+        // the user makes another navigation selection.
+        if (connectFragment != null && connectFragment.isAdded() && !connectFragment.isHidden()) {
+            activeFragment = connectFragment;
+            updateHomeHeroVisibility(connectFragment);
+        }
+
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
@@ -260,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void showFragment(Fragment fragment, String tag) {
         if (activeFragment == fragment) {
+            updateHomeHeroVisibility(fragment);
             return;
         }
         FragmentManager fm = getSupportFragmentManager();
@@ -276,6 +287,14 @@ public class MainActivity extends AppCompatActivity {
         transaction.show(fragment);
         transaction.commit();
         activeFragment = fragment;
+        updateHomeHeroVisibility(fragment);
+    }
+
+    /** The large hero belongs to Home; Community uses its own compact service-backed player. */
+    private void updateHomeHeroVisibility(Fragment destination) {
+        if (homeLiveHero != null) {
+            homeLiveHero.setVisibility(destination == homeFragment ? View.VISIBLE : View.GONE);
+        }
     }
 
     /** Opens the Home-owned all-shows route without changing the selected bottom-nav tab. */

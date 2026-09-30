@@ -2,24 +2,27 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:fillViewport="true" android:paddingBottom="24dp">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@color/kasie_background" android:orientation="vertical" android:padding="16dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="COMMUNITY" android:textAppearance="@style/TextAppearance.Kasie.Section" android:textColor="@color/kasie_accent" />
-
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:background="@drawable/bg_dark_card" android:gravity="center_vertical" android:orientation="horizontal" android:padding="14dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_community_player" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="11dp" android:paddingEnd="8dp" android:paddingBottom="11dp">
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
                 <TextView android:id="@+id/community_live_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="● PAUSED" android:textColor="@color/kasie_accent" android:textSize="11sp" android:typeface="monospace" />
                 <TextView android:id="@+id/community_live_show_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:ellipsize="end" android:maxLines="1" android:text="Kasie FM Live" android:textColor="@color/kasie_text_primary" android:textSize="16sp" android:textStyle="bold" />
                 <TextView android:id="@+id/community_live_show_time" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:ellipsize="end" android:maxLines="1" android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
             </LinearLayout>
-            <com.google.android.material.button.MaterialButton android:id="@+id/community_live_play_button" android:layout_width="48dp" android:layout_height="48dp" android:backgroundTint="@color/kasie_accent" android:text="▶" android:textColor="@color/kasie_text_on_accent" android:textSize="18sp" app:cornerRadius="0dp" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/community_live_play_button" android:layout_width="44dp" android:layout_height="44dp" android:backgroundTint="@color/kasie_accent" android:text="▶" android:textColor="@color/kasie_text_on_accent" android:textSize="18sp" app:cornerRadius="0dp" />
         </LinearLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:orientation="horizontal">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-black" android:text="COMMUNITY" android:textColor="@color/kasie_text_primary" android:textSize="22sp" />
+            <View android:layout_width="44dp" android:layout_height="3dp" android:layout_marginTop="6dp" android:background="@color/kasie_accent" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:orientation="horizontal">
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:id="@+id/message_studio_tab" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:paddingBottom="8dp" android:text="MESSAGE STUDIO" android:textColor="@color/kasie_accent" android:textSize="12sp" android:textStyle="bold" />
+                <TextView android:id="@+id/message_studio_tab" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:paddingTop="8dp" android:paddingBottom="10dp" android:text="MESSAGE STUDIO" android:textColor="@color/kasie_accent" android:textSize="12sp" android:textStyle="bold" />
                 <View android:id="@+id/message_studio_indicator" android:layout_width="match_parent" android:layout_height="2dp" android:background="@color/kasie_accent" />
             </LinearLayout>
             <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                <TextView android:id="@+id/group_chats_tab" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:paddingBottom="8dp" android:text="GROUP CHATS" android:textColor="@color/kasie_text_muted" android:textSize="12sp" android:textStyle="bold" />
+                <TextView android:id="@+id/group_chats_tab" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:paddingTop="8dp" android:paddingBottom="10dp" android:text="GROUP CHATS" android:textColor="@color/kasie_text_muted" android:textSize="12sp" android:textStyle="bold" />
                 <View android:id="@+id/group_chats_indicator" android:layout_width="match_parent" android:layout_height="2dp" android:background="@color/kasie_outline" />
             </LinearLayout>
         </LinearLayout>
@@ -54,20 +57,39 @@
         </LinearLayout>
 
         <LinearLayout android:id="@+id/group_chats_container" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="GROUP CHATS" android:textAppearance="@style/TextAppearance.Kasie.Section" />
-            <LinearLayout android:id="@+id/live_show_chat_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:background="@drawable/bg_dark_card" android:clickable="true" android:focusable="true" android:orientation="vertical" android:padding="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Live Show Chat" android:textColor="@color/kasie_text_primary" android:textSize="16sp" android:textStyle="bold" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Chat with listeners during the current show." android:textColor="@color/kasie_text_muted" android:textSize="13sp" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:fontFamily="monospace" android:letterSpacing="0.08" android:text="ON THE LINE" android:textColor="@color/kasie_text_muted" android:textSize="10sp" />
+            <LinearLayout android:id="@+id/live_show_chat_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_community_chat_card" android:clickable="true" android:focusable="true" android:gravity="center_vertical" android:minHeight="84dp" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="10dp" android:paddingEnd="12dp" android:paddingBottom="10dp">
+                <FrameLayout android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/bg_community_icon_tile"><ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:contentDescription="Live show chat" android:src="@drawable/ic_community_chat" /></FrameLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="monospace" android:text="LIVE NOW" android:textColor="@color/kasie_accent" android:textSize="10sp" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="1" android:text="LIVE SHOW CHAT" android:textColor="@color/kasie_text_primary" android:textSize="15sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:ellipsize="end" android:maxLines="2" android:text="Chat with listeners during the current show." android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="JOIN  ›" android:textColor="@color/kasie_accent" android:textSize="11sp" android:textStyle="bold" />
             </LinearLayout>
-            <LinearLayout android:id="@+id/community_lounge_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_dark_card" android:clickable="true" android:focusable="true" android:orientation="vertical" android:padding="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Community Lounge" android:textColor="@color/kasie_text_primary" android:textSize="16sp" android:textStyle="bold" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="General Kasie FM community conversation." android:textColor="@color/kasie_text_muted" android:textSize="13sp" />
+            <LinearLayout android:id="@+id/community_lounge_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:background="@drawable/bg_community_chat_card" android:clickable="true" android:focusable="true" android:gravity="center_vertical" android:minHeight="84dp" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="10dp" android:paddingEnd="12dp" android:paddingBottom="10dp">
+                <FrameLayout android:layout_width="42dp" android:layout_height="42dp" android:background="@drawable/bg_community_icon_tile"><ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:contentDescription="Community lounge" android:src="@drawable/ic_community_group" /></FrameLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="monospace" android:text="THE KASIE" android:textColor="@color/kasie_accent" android:textSize="10sp" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="1" android:text="COMMUNITY LOUNGE" android:textColor="@color/kasie_text_primary" android:textSize="15sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:ellipsize="end" android:maxLines="2" android:text="General Kasie FM community conversation." android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="JOIN  ›" android:textColor="@color/kasie_accent" android:textSize="11sp" android:textStyle="bold" />
             </LinearLayout>
-            <LinearLayout android:id="@+id/local_events_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/bg_dark_card" android:clickable="true" android:focusable="true" android:orientation="vertical" android:padding="16dp">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Local Events" android:textColor="@color/kasie_text_primary" android:textSize="16sp" android:textStyle="bold" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="5dp" android:text="Talk about events happening in the community." android:textColor="@color/kasie_text_muted" android:textSize="13sp" />
+            <LinearLayout android:id="@+id/local_events_card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="9dp" android:background="@drawable/bg_community_chat_card" android:clickable="true" android:focusable="true" android:gravity="center_vertical" android:minHeight="84dp" android:orientation="horizontal" android:paddingStart="14dp" android:paddingTop="10dp" android:paddingEnd="12dp" android:paddingBottom="10dp">
+                <FrameLayout android:layout_width="42dp" android:layout_height="42dp" android:layout_marginTop="1dp" android:background="@drawable/bg_community_icon_tile"><ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:contentDescription="Local events" android:src="@drawable/ic_community_event" /></FrameLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="monospace" android:text="WHAT'S HAPPENING" android:textColor="@color/kasie_accent" android:textSize="10sp" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:ellipsize="end" android:maxLines="1" android:text="LOCAL EVENTS" android:textColor="@color/kasie_text_primary" android:textSize="15sp" android:textStyle="bold" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="3dp" android:ellipsize="end" android:maxLines="2" android:text="Talk about events happening in the community." android:textColor="@color/kasie_text_muted" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="JOIN  ›" android:textColor="@color/kasie_accent" android:textSize="11sp" android:textStyle="bold" />
             </LinearLayout>
-            <Space android:layout_width="match_parent" android:layout_height="88dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="72dp" android:layout_marginTop="18dp" android:background="@drawable/bg_dark_card" android:gravity="center" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="monospace" android:letterSpacing="0.06" android:text="SPONSORED / LOCAL PARTNER" android:textColor="@color/kasie_text_muted" android:textSize="10sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Reserved community space" android:textColor="@color/kasie_text_secondary" android:textSize="12sp" />
+            </LinearLayout>
+            <Space android:layout_width="match_parent" android:layout_height="24dp" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
