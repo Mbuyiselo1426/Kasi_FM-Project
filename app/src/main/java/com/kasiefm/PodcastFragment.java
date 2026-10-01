@@ -257,7 +257,7 @@ public class PodcastFragment extends Fragment {
             }
 
             @Override public void onPlayerError(@NonNull PlaybackException error) {
-                Log.e("KasiePodcast", "Playback failed: code=" + error.errorCodeName
+                Log.e("KasiePodcast", "Playback failed: code=" + error.getErrorCodeName()
                         + ", message=" + error.getMessage()
                         + ", title=" + (selectedEpisode == null ? "" : selectedEpisode.getTitle())
                         + ", audioUrl=" + (selectedEpisode == null ? "" : selectedEpisode.getAudioUrl()),
