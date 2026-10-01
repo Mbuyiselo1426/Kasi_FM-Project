@@ -280,7 +280,8 @@ public class ConnectFragment extends Fragment {
 
     private void submitMessage(StudioMessage message) {
         sendButton.setEnabled(false);
-        sendButton.setText("SENDING...");
+        sendButton.setIcon(null);
+        sendButton.setText("SENDING…");
         MessageRequest request = new MessageRequest(
                 message.getListenerName(), message.getMessageType().name(), message.getMessage(),
                 message.getSongTitle(), message.getArtist());
@@ -311,7 +312,8 @@ public class ConnectFragment extends Fragment {
 
     private void restoreSendButton() {
         sendButton.setEnabled(true);
-        sendButton.setText("SEND MESSAGE");
+        sendButton.setIconResource(R.drawable.ic_send_to_studio);
+        sendButton.setText("SEND TO STUDIO");
     }
 
     private void clearSubmittedForm() {

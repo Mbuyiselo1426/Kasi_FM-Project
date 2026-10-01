@@ -2,6 +2,7 @@ package com.kasiefm;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -256,6 +257,11 @@ public class PodcastFragment extends Fragment {
             }
 
             @Override public void onPlayerError(@NonNull PlaybackException error) {
+                Log.e("KasiePodcast", "Playback failed: code=" + error.errorCodeName
+                        + ", message=" + error.getMessage()
+                        + ", title=" + (selectedEpisode == null ? "" : selectedEpisode.getTitle())
+                        + ", audioUrl=" + (selectedEpisode == null ? "" : selectedEpisode.getAudioUrl()),
+                        error);
                 resetSelectedButton();
                 if (status != null) {
                     status.setVisibility(View.VISIBLE);
